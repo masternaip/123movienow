@@ -506,4 +506,22 @@ body {
     .movie-list img {
         height: 150px;
     }
+.movie-list {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+.movie-card {
+  border: 1px solid #ccc;
+  padding: 10px;
+  width: 180px;
+  text-align: center;
+  background: #fff;
+  border-radius: 8px;
+}
+.movie-card img {
+  width: 100%;
+  border-radius: 4px;
+}
 }

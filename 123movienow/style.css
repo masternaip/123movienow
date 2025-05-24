@@ -61,7 +61,7 @@ body {
     color: var(--text-color);
 }
 
-/* NEW: Active navigation link style */
+/* Active navigation link style */
 .nav-links a.active {
     color: var(--text-color); /* Stronger white for active */
     font-weight: bold;
@@ -408,13 +408,13 @@ body {
     box-shadow: 0 5px 15px var(--box-shadow-color);
 }
 
-/* NEW: Styles for the Movies page main content */
+/* Styles for the Movies page main content */
 .movies-page-main {
     padding-top: 100px; /* Adjust main content padding to clear fixed header */
     padding-bottom: 50px; /* Ensure space at the bottom */
 }
 
-/* NEW: Style for the Movies page title */
+/* Style for the Movies page title */
 .movies-page-main .page-title {
     font-size: 3rem;
     padding: 0 50px 20px; /* Adjust padding to match section padding */

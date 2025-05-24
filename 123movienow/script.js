@@ -8,33 +8,11 @@ let bannerItems = [];
 let currentBannerIndex = 0;
 let bannerInterval; // To hold the interval ID
 
-// Function to fetch trending movies/tv shows (now specifically daily trending)
-async function fetchTrending(type) {
-    const res = await fetch(`${BASE_URL}/trending/${type}/day?api_key=${API_KEY}`);
+// Reusable fetch function for various movie lists
+async function fetchMovies(endpoint, queryParams = '') {
+    const res = await fetch(`${BASE_URL}/${endpoint}?api_key=${API_KEY}${queryParams}`);
     const data = await res.json();
-    return data.results;
-}
-
-// Function to fetch weekly trending movies
-async function fetchWeeklyTrendingMovies() {
-    const res = await fetch(`${BASE_URL}/trending/movie/week?api_key=${API_KEY}`);
-    const data = await res.json();
-    return data.results;
-}
-
-// NEW: Function to fetch movies by production company
-async function fetchMoviesByCompany(companyId) {
-    // You can adjust sort_by as needed, e.g., 'vote_average.desc' for "top"
-    const res = await fetch(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_companies=${companyId}&sort_by=popularity.desc`);
-    const data = await res.json();
-    return data.results;
-}
-
-// NEW: Function to fetch movies by network (useful for Netflix originals)
-async function fetchMoviesByNetwork(networkId) {
-    const res = await fetch(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_networks=${networkId}&sort_by=popularity.desc`);
-    const data = await res.json();
-    return data.results;
+    return data.results || data.items; // Some endpoints like /list/id return 'items'
 }
 
 // Function to display the main banner
@@ -43,6 +21,11 @@ function displayBanner(item) {
     const bannerTitle = document.getElementById('banner-title');
     const bannerDescription = document.getElementById('banner-description');
 
+    // Ensure banner elements exist before trying to update them (they won't on movies.html)
+    if (!bannerElement || !bannerTitle || !bannerDescription) {
+        return;
+    }
+
     // Apply fade-out effect
     bannerElement.style.opacity = 0;
     bannerTitle.style.opacity = 0;
@@ -50,7 +33,7 @@ function displayBanner(item) {
 
     // After fade-out, change content and fade in
     setTimeout(() => {
-        bannerElement.style.backgroundImage = `url(${IMG_URL}${item.backdrop_path}`;
+        bannerElement.style.backgroundImage = `url(${IMG_URL}${item.backdrop_path})`;
         bannerTitle.textContent = item.title || item.name;
         bannerDescription.textContent = item.overview;
         currentItem = item; // Set the current item for the banner as well
@@ -65,6 +48,11 @@ function displayBanner(item) {
 // Function to update active dot for banner slideshow
 function updateBannerDots() {
     const dotsContainer = document.getElementById('banner-nav-dots');
+    // Ensure dots container exists (it won't on movies.html)
+    if (!dotsContainer) {
+        return;
+    }
+
     dotsContainer.innerHTML = ''; // Clear existing dots
 
     bannerItems.forEach((_, index) => {
@@ -86,6 +74,11 @@ function updateBannerDots() {
 
 // Function to start the banner slideshow
 function startBannerSlideshow() {
+    // Only start if banner elements exist
+    if (!document.getElementById('banner')) {
+        return;
+    }
+
     // Clear any existing interval to prevent multiple slideshows
     clearInterval(bannerInterval);
 
@@ -96,9 +89,15 @@ function startBannerSlideshow() {
     }, 8000); // Change banner every 8 seconds (adjust as needed)
 }
 
+
 // Function to display lists of movies/tv shows
 function displayList(items, containerId) {
     const container = document.getElementById(containerId);
+    // Only proceed if the container element exists on the current page
+    if (!container) {
+        // console.warn(`Container with ID '${containerId}' not found on this page.`);
+        return;
+    }
     container.innerHTML = ''; // Clear previous content
     items.forEach(item => {
         if (!item.poster_path) return; // Skip items without a poster
@@ -187,39 +186,64 @@ async function searchTMDB() {
     });
 }
 
-// Initialize function to load content on page load
-async function init() {
-    const movies = await fetchTrending('movie');
-    const tvShows = await fetchTrending('tv');
-    const weeklyTrendMovie = await fetchWeeklyTrendingMovies();
+// New: Function to load content specific to the Movies page
+async function loadMoviesPageContent() {
+    console.log("Loading Movies Page Content...");
+    // Common movie lists for the Movies page
+    const popularMovies = await fetchMovies('movie/popular');
+    const topRatedMovies = await fetchMovies('movie/top_rated');
+    const upcomingMovies = await fetchMovies('movie/upcoming');
+    const nowPlayingMovies = await fetchMovies('movie/now_playing');
 
-    // NEW: Fetch movies by production company/network
-    const hboMovies = await fetchMoviesByCompany(3268); // HBO production company ID
-    const netflixMovies = await fetchMoviesByNetwork(213); // Netflix network ID for originals
-    const marvelMovies = await fetchMoviesByCompany(420); // Marvel Studios production company ID
-    const disneyMovies = await fetchMoviesByCompany(2); // Walt Disney Pictures production company ID
-    // Alternative for Disney: fetch a curated list from TMDB if you prefer:
-    // const disneyMovies = await fetch(`${BASE_URL}/list/5905?api_key=${API_KEY}`).then(res => res.json()).then(data => data.items);
+    // Genre-specific movie lists (example genre IDs)
+    const actionMovies = await fetchMovies('discover/movie', '&with_genres=28'); // Action
+    const comedyMovies = await fetchMovies('discover/movie', '&with_genres=35'); // Comedy
+    const horrorMovies = await fetchMovies('discover/movie', '&with_genres=27'); // Horror
+    const documentaryMovies = await fetchMovies('discover/movie', '&with_genres=99'); // Documentary
+
+    displayList(popularMovies, 'popular-movies-list');
+    displayList(topRatedMovies, 'top-rated-movies-list');
+    displayList(upcomingMovies, 'upcoming-movies-list');
+    displayList(nowPlayingMovies, 'now-playing-movies-list');
+    displayList(actionMovies, 'action-movies-list');
+    displayList(comedyMovies, 'comedy-movies-list');
+    displayList(horrorMovies, 'horror-movies-list');
+    displayList(documentaryMovies, 'documentary-movies-list');
+}
+
+// New: Function to load content specific to the Home page
+async function loadHomePageContent() {
+    console.log("Loading Home Page Content...");
+    const movies = await fetchMovies('trending/movie/day'); // Daily trending movies
+    const tvShows = await fetchMovies('trending/tv/day'); // Daily trending TV shows
+    const weeklyTrendMovie = await fetchMovies('trending/movie/week');
+
+    // Production Company/Network based lists
+    const hboMovies = await fetchMovies('discover/movie', '&with_companies=3268&sort_by=popularity.desc');
+    const netflixMovies = await fetchMovies('discover/movie', '&with_networks=213&sort_by=popularity.desc');
+    const marvelMovies = await fetchMovies('discover/movie', '&with_companies=420&sort_by=popularity.desc');
+    const disneyMovies = await fetchMovies('discover/movie', '&with_companies=2&sort_by=popularity.desc');
 
     // Populate bannerItems with a mix of daily trending movies and TV shows
-    bannerItems = [...movies.slice(0, 5), ...tvShows.slice(0, 5)]; // Take top 5 from each
+    bannerItems = [...movies.slice(0, 5), ...tvShows.slice(0, 5)];
     if (bannerItems.length > 0) {
         displayBanner(bannerItems[currentBannerIndex]);
         updateBannerDots();
-        startBannerSlideshow(); // Start the slideshow
+        startBannerSlideshow();
     }
 
-    displayList(movies, 'movies-list');
-    displayList(tvShows, 'tvshows-list');
+    displayList(tvShows, 'tvshows-list'); // Only TV shows on home now
     displayList(weeklyTrendMovie, 'weekly-trend-movie-list');
-
-    // NEW: Display the new lists
     displayList(hboMovies, 'hbo-movies-list');
     displayList(netflixMovies, 'netflix-movies-list');
     displayList(marvelMovies, 'marvel-movies-list');
     displayList(disneyMovies, 'disney-movies-list');
+}
 
-    // Add scroll event listener to header for background change
+
+// Initialize function to load content based on the current page
+async function init() {
+    // Add scroll event listener to header for background change (always relevant)
     window.addEventListener('scroll', () => {
         const header = document.querySelector('.header');
         if (window.scrollY > 50) {
@@ -228,6 +252,25 @@ async function init() {
             header.classList.remove('scrolled');
         }
     });
+
+    const currentPage = window.location.pathname.split('/').pop();
+
+    // Highlight active nav link
+    document.querySelectorAll('.nav-links a').forEach(link => {
+        if (link.getAttribute('href') === currentPage) {
+            link.classList.add('active');
+        } else {
+            link.classList.remove('active');
+        }
+    });
+
+
+    if (currentPage === '' || currentPage === 'index.html') {
+        loadHomePageContent();
+    } else if (currentPage === 'movies.html') {
+        loadMoviesPageContent();
+    }
+    // You can add more else if for other pages like 'tvshows.html', 'newpopular.html' etc.
 }
 
 // Call init when the DOM is fully loaded

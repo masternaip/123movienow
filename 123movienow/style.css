@@ -407,32 +407,5 @@ a { color: var(--netflix-red); text-decoration: none; }
 .site-nav a:hover, .site-nav a.active {
   color: #e50914;
 }
-.site-nav a.active::after, .site-nav a:hover::after {
-  content: '';
-  display: block;
-  height: 2px;
-  background: #e50914;
-  border-radius: 2px;
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  right: 0;
-}
-
-/* === Responsive Design === */
-@media (max-width: 900px) {
-  #banner { min-height: 200px; padding: 20px 12px; }
-  .modal-content { flex-direction: column; gap: 13px; padding: 12px 2vw; }
-  #modal-image { width: 110px; height: 156px; }
-  .modal-video-container { height: 190px; }
-}
-@media (max-width: 600px) {
-  #banner { min-height: 110px; padding: 6vw 2vw; }
-  #banner-title { font-size: 1.37em; }
-  .banner-buttons button { font-size: 0.98em; padding: 7px 12px; }
-  .modal-content { padding: 5vw 1vw; }
-  #modal-image { width: 70px; height: 100px; }
-  .modal-video-container { height: 110px; }
-  .search-modal-content { padding: 12px 3vw; max-width: 99vw; }
-  .search-result-item img { width: 32px; height: 48px; }
-}
+.site-nav*
+

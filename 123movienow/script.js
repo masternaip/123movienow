@@ -1,249 +1,121 @@
 // ==== Configuration ====
 const API_KEY = 'a1e72fd93ed59f56e6332813b9f8dcae';
-const BASE_URL = 'https://api.themoviedb.org/3';
-const IMG_URL = 'https://image.tmdb.org/t/p/w780';
-const FALLBACK_IMG = 'https://via.placeholder.com/300x450?text=No+Image';
+// ==== CONFIG ====
 
-// ==== Banner Rotation Globals ====
-let bannerMovies = [];
-let bannerIndex = 0;
-let bannerInterval = null;
-
-// ==== Modal State ====
-window.currentItem = null;
+// Genre IDs for TV
+const GENRE_IDS = {
+  action: 10759,      // Action & Adventure
+  horror: 9648,       // Mystery (closest for TV)
+  adventure: 10759,   // Action & Adventure (same as action)
+  drama: 18           // Drama
+};
 
 // ==== Fetch Functions ====
-async function fetchFromTmdb(endpoint) {
-  try {
-    const res = await fetch(endpoint);
-    if (!res.ok) throw new Error('Network response was not ok');
-    const data = await res.json();
-    return data.results || [];
-  } catch (error) {
-    console.error('TMDb fetch error:', error);
-    return [];
+async function fetchTVShows(category) {
+  let url;
+  if (category === 'trending') {
+    url = `https://api.themoviedb.org/3/trending/tv/week?api_key=${TMDB_API_KEY}`;
+  } else {
+    url = `https://api.themoviedb.org/3/discover/tv?api_key=${TMDB_API_KEY}&with_genres=${GENRE_IDS[category]}&sort_by=popularity.desc`;
   }
+  const res = await fetch(url);
+  const data = await res.json();
+  return data.results || [];
 }
 
-async function fetchTrending(type = 'movie') {
-  return fetchFromTmdb(`${BASE_URL}/trending/${type}/week?api_key=${API_KEY}`);
-}
-async function fetchMoviesByCompany(companyId) {
-  return fetchFromTmdb(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_companies=${companyId}&sort_by=popularity.desc`);
-}
-async function fetchMoviesByNetwork(networkId) {
-  return fetchFromTmdb(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_networks=${networkId}&sort_by=popularity.desc`);
-}
-async function searchTMDb(query) {
-  const movieResults = await fetchFromTmdb(`${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
-  const tvResults = await fetchFromTmdb(`${BASE_URL}/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
-  // Add media_type for identification
-  movieResults.forEach(r => r.media_type = 'movie');
-  tvResults.forEach(r => r.media_type = 'tv');
-  return [...movieResults, ...tvResults];
+// ==== Card Creator ====
+function createShowCard(show) {
+  const poster = show.poster_path
+    ? `https://image.tmdb.org/t/p/w300${show.poster_path}`
+    : 'https://via.placeholder.com/120x180?text=No+Image';
+  const title = show.name || show.title || 'Untitled';
+  return `
+    <div class="tvshow-card" onclick="showDetails(${show.id}, 'tv')">
+      <img src="${poster}" alt="${title}" />
+      <div class="tvshow-title" style="text-align:center;margin-top:7px;font-size:1em;">${title}</div>
+    </div>
+  `;
 }
 
-// ==== Render Functions ====
-function displayList(items, containerId) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  container.innerHTML = '';
-  items.forEach(item => {
-    const img = document.createElement('img');
-    img.src = item.poster_path 
-      ? IMG_URL + item.poster_path 
-      : item.backdrop_path 
-        ? IMG_URL + item.backdrop_path 
-        : FALLBACK_IMG;
-    img.alt = item.title || item.name || 'Movie Poster';
-    img.loading = 'lazy';
-    img.onerror = () => { img.src = FALLBACK_IMG; };
-    img.onclick = () => showDetails(item);
-    container.appendChild(img);
-  });
+// ==== Populate Sections ====
+async function loadTVShows() {
+  // Trending
+  const trending = await fetchTVShows('trending');
+  document.getElementById('tvshows-trending').innerHTML = trending.map(createShowCard).join('');
+
+  // Action
+  const action = await fetchTVShows('action');
+  document.getElementById('tvshows-action').innerHTML = action.map(createShowCard).join('');
+
+  // Horror
+  const horror = await fetchTVShows('horror');
+  document.getElementById('tvshows-horror').innerHTML = horror.map(createShowCard).join('');
+
+  // Adventure
+  const adventure = await fetchTVShows('adventure');
+  document.getElementById('tvshows-adventure').innerHTML = adventure.map(createShowCard).join('');
+
+  // Drama
+  const drama = await fetchTVShows('drama');
+  document.getElementById('tvshows-drama').innerHTML = drama.map(createShowCard).join('');
 }
 
-// ==== Banner Functions ====
-function updateBanner(movie) {
-  const banner = document.getElementById('banner');
-  const bannerTitle = document.getElementById('banner-title');
-  const bannerDesc = document.getElementById('banner-description');
-  if (!banner || !bannerTitle || !bannerDesc) return;
+// ==== Modal Logic (simplified for demo) ====
+window.showDetails = async function(tvId, type) {
+  // Fetch details (or use your existing modal code)
+  // Here is a basic version as an example:
+  const url = `https://api.themoviedb.org/3/tv/${tvId}?api_key=${TMDB_API_KEY}`;
+  const res = await fetch(url);
+  const show = await res.json();
 
-  bannerTitle.textContent = movie.title || movie.name || 'Untitled';
-  bannerDesc.textContent = movie.overview || 'No description available.';
-  banner.style.backgroundImage = movie.backdrop_path
-      ? `url(${IMG_URL + movie.backdrop_path})`
-      : movie.poster_path
-        ? `url(${IMG_URL + movie.poster_path})`
-        : 'none';
+  document.getElementById('modal-title').textContent = show.name || show.original_name || 'Untitled';
+  document.getElementById('modal-description').textContent = show.overview || 'No description.';
+  document.getElementById('modal-rating').textContent = `⭐ ${show.vote_average || 'N/A'}`;
+  document.getElementById('modal-image').src = show.poster_path
+    ? `https://image.tmdb.org/t/p/w300${show.poster_path}`
+    : 'https://via.placeholder.com/160x240?text=No+Image';
 
-  window.currentItem = movie;
-  updateBannerDots();
-}
+  // Hide video by default for TV (or implement your own logic)
+  document.getElementById('modal-video').style.display = 'none';
 
-function updateBannerDots() {
-  const dotsContainer = document.getElementById('banner-nav-dots');
-  if (!dotsContainer) return;
-  dotsContainer.innerHTML = '';
-  bannerMovies.forEach((_, idx) => {
-    const dot = document.createElement('span');
-    dot.className = 'dot' + (idx === bannerIndex ? ' active' : '');
-    dot.onclick = () => showBannerAt(idx);
-    dotsContainer.appendChild(dot);
-  });
-}
+  // Show modal
+  document.getElementById('modal').style.display = 'flex';
+};
 
-function showBannerAt(idx) {
-  if (bannerMovies.length === 0) return;
-  bannerIndex = idx;
-  updateBanner(bannerMovies[bannerIndex]);
-  restartBannerRotation();
-}
+window.closeModal = function() {
+  document.getElementById('modal').style.display = 'none';
+};
 
-function startBannerRotation() {
-  if (bannerInterval) clearInterval(bannerInterval);
-  bannerInterval = setInterval(() => {
-    if (bannerMovies.length === 0) return;
-    bannerIndex = (bannerIndex + 1) % bannerMovies.length;
-    updateBanner(bannerMovies[bannerIndex]);
-  }, 5000);
-}
-function restartBannerRotation() {
-  startBannerRotation();
-}
-
-// ==== Video Server Embed URL ====
-function getEmbedURL(server, currentItem) {
-  const type = currentItem.media_type
-    ? (currentItem.media_type === "movie" ? "movie" : "tv")
-    : (currentItem.title ? "movie" : "tv");
-
-  let embedURL = "";
-  if (server === "vidsrc.cc") {
-    embedURL = `https://vidsrc.cc/v2/embed/${type}/${currentItem.id}`;
-  } else if (server === "vidsrc.me" || server === "vidsrc.net") {
-    embedURL = `https://vidsrc.net/embed/${type}/?tmdb=${currentItem.id}`;
-  } else if (server === "player.videasy.net") {
-    embedURL = `https://player.videasy.net/${type}/${currentItem.id}`;
-  }
-  return embedURL;
-}
-
-// ==== Modal Functions ====
-function showDetails(item) {
-  window.currentItem = item;
-  const modalTitle = document.getElementById('modal-title');
-  const modalDesc = document.getElementById('modal-description');
-  const modalRating = document.getElementById('modal-rating');
-  const modalImage = document.getElementById('modal-image');
-  const modalVideo = document.getElementById('modal-video');
-  const modal = document.getElementById('modal');
-  const serverSelect = document.getElementById('server');
-  if (!modalTitle || !modalDesc || !modalRating || !modalImage || !modalVideo || !modal || !serverSelect) return;
-  modalTitle.textContent = item.title || item.name || 'Untitled';
-  modalDesc.textContent = item.overview || 'No description available.';
-  modalRating.textContent = "⭐ " + (item.vote_average || "N/A");
-  modalImage.src = item.poster_path 
-    ? IMG_URL + item.poster_path 
-    : item.backdrop_path 
-      ? IMG_URL + item.backdrop_path 
-      : FALLBACK_IMG;
-
-  const server = serverSelect.value;
-  modalVideo.src = getEmbedURL(server, item);
-  document.getElementById('video-error-message')?.style.setProperty('display', 'none');
-  modal.style.display = "flex";
-}
-
-function changeServer() {
-  const server = document.getElementById('server').value;
-  const modalVideo = document.getElementById('modal-video');
-  if (!window.currentItem || !modalVideo) return;
-  modalVideo.src = getEmbedURL(server, window.currentItem);
-  document.getElementById('video-error-message')?.style.setProperty('display', 'none');
-}
-function closeModal() {
-  const modal = document.getElementById('modal');
-  const modalVideo = document.getElementById('modal-video');
-  if (modal) modal.style.display = 'none';
-  if (modalVideo) modalVideo.src = '';
-}
-document.getElementById('modal-video')?.addEventListener('error', function () {
-  const errMsg = document.getElementById('video-error-message');
-  if (errMsg) errMsg.style.display = 'block';
-});
-document.addEventListener('keydown', function (e) {
-  if (e.key === 'Escape') closeModal();
-});
-document.getElementById('modal')?.addEventListener('click', function (e) {
-  if (e.target === this) closeModal();
-});
-
-// ==== Page Initialization ====
-window.addEventListener('DOMContentLoaded', async () => {
-  // Banner movies (Trending)
-  bannerMovies = await fetchTrending('movie');
-  if (bannerMovies && bannerMovies.length > 0) {
-    bannerIndex = 0;
-    updateBanner(bannerMovies[bannerIndex]);
-    startBannerRotation();
-  }
-  const movies = bannerMovies;
-  displayList(movies, 'movies-list');
-  const tvshows = await fetchTrending('tv');
-  displayList(tvshows, 'tvshows-list');
-  displayList(movies, 'weekly-trend-movie-list');
-  const hboMovies = await fetchMoviesByCompany(3268);
-  displayList(hboMovies, 'hbo-movies-list');
-  const netflixMovies = await fetchMoviesByNetwork(213);
-  displayList(netflixMovies, 'netflix-movies-list');
-  const marvelMovies = await fetchMoviesByCompany(420);
-  displayList(marvelMovies, 'marvel-movies-list');
-  const disneyMovies = await fetchMoviesByCompany(2);
-  displayList(disneyMovies, 'disney-movies-list');
-});
-
-// ==== Search Modal ====
-function openSearchModal() {
+// ==== Search Modal Logic ====
+window.openSearchModal = function() {
   document.getElementById('search-modal').style.display = 'flex';
   document.getElementById('search-input').focus();
-}
-function closeSearchModal() {
+};
+window.closeSearchModal = function() {
   document.getElementById('search-modal').style.display = 'none';
   document.getElementById('search-results').innerHTML = '';
-}
-async function searchTMDB() {
-  const query = document.getElementById('search-input').value.trim();
-  const resultsDiv = document.getElementById('search-results');
-  if (!query) {
-    resultsDiv.innerHTML = '<p>Please enter a search term.</p>';
-    return;
+  document.getElementById('search-input').value = '';
+};
+
+window.searchTMDB = async function() {
+  const q = document.getElementById('search-input').value.trim();
+  if (!q) return;
+  const url = `https://api.themoviedb.org/3/search/tv?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(q)}`;
+  const res = await fetch(url);
+  const data = await res.json();
+  const results = (data.results || []).slice(0, 12);
+  document.getElementById('search-results').innerHTML = results.length
+    ? results.map(createShowCard).join('')
+    : '<div style="color:#ccc;text-align:center;">No results found.</div>';
+};
+
+// ==== DOMContentLoaded ====
+document.addEventListener('DOMContentLoaded', loadTVShows);
+
+// Optional: Close modals on ESC
+window.addEventListener('keydown', function(e){
+  if (e.key==='Escape') {
+    closeModal();
+    closeSearchModal();
   }
-  resultsDiv.innerHTML = '<p>Searching...</p>';
-  const results = await searchTMDb(query);
-  if (!results.length) {
-    resultsDiv.innerHTML = '<p>No results found.</p>';
-    return;
-  }
-  resultsDiv.innerHTML = '';
-  results.forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'search-result-item';
-    div.innerHTML = `
-      <img src="${item.poster_path ? IMG_URL + item.poster_path : FALLBACK_IMG}" alt="${item.title || item.name || 'Poster'}" />
-      <div>
-        <strong>${item.title || item.name || 'Untitled'}</strong> <span style="font-size:0.9em;color:#888;">(${item.media_type === 'movie' ? 'Movie' : 'TV'})</span>
-        <p style="font-size:0.95em;">${item.overview ? item.overview.substring(0, 120) + '...' : 'No description.'}</p>
-      </div>
-    `;
-    div.onclick = () => {
-      closeSearchModal();
-      showDetails(item);
-    };
-    resultsDiv.appendChild(div);
-  });
-}
-document.getElementById('search-input')?.addEventListener('keydown', function(e){
-  if(e.key === 'Enter') searchTMDB();
 });

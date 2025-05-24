@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movies - 123MovieNow</title>
+    <title>Home - 123MovieNow</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23e50914' d='M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z'/%3E%3C/svg%3E">
 </head>
 <body>
     <header class="header">
@@ -14,9 +13,9 @@
         </div>
         <nav class="nav-links">
             <ul>
-                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html" class="active">Home</a></li>
                 <li><a href="#">TV Shows</a></li>
-                <li><a href="movies.html" class="active">Movies</a></li>
+                <li><a href="movies.html">Movies</a></li>
                 <li><a href="#">New & Popular</a></li>
                 <li><a href="#">My List</a></li>
             </ul>
@@ -25,44 +24,50 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-search"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         </div>
     </header>
-
-    <main class="movies-page-main">
-        <h1 class="page-title">Movies</h1>
-
-        <section class="movie-list-section">
-            <h2>Popular Movies</h2>
-            <div class="movie-list" id="popular-movies-list"></div>
+    <main>
+        <section class="banner" id="banner">
+            <div class="banner-content">
+                <h1 id="banner-title"></h1>
+                <p id="banner-description"></p>
+                <div class="banner-buttons">
+                    <button class="play-button" onclick="showDetails(currentItem)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor"><polygon points="5,3 19,12 5,21"></polygon></svg>
+                        Play
+                    </button>
+                    <button class="info-button" onclick="showDetails(currentItem)">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="8"/></svg>
+                        More Info
+                    </button>
+                </div>
+            </div>
+            <div class="banner-nav-dots" id="banner-nav-dots"></div>
         </section>
         <section class="movie-list-section">
-            <h2>Top Rated Movies</h2>
-            <div class="movie-list" id="top-rated-movies-list"></div>
+            <h2>Trending TV Shows</h2>
+            <div class="movie-list" id="tvshows-list"></div>
         </section>
         <section class="movie-list-section">
-            <h2>Upcoming Movies</h2>
-            <div class="movie-list" id="upcoming-movies-list"></div>
+            <h2>Weekly Trend Movie</h2>
+            <div class="movie-list" id="weekly-trend-movie-list"></div>
         </section>
         <section class="movie-list-section">
-            <h2>Now Playing Movies</h2>
-            <div class="movie-list" id="now-playing-movies-list"></div>
+            <h2>Top HBO Movies</h2>
+            <div class="movie-list" id="hbo-movies-list"></div>
         </section>
         <section class="movie-list-section">
-            <h2>Action Movies</h2>
-            <div class="movie-list" id="action-movies-list"></div>
+            <h2>Top Netflix Movies</h2>
+            <div class="movie-list" id="netflix-movies-list"></div>
         </section>
         <section class="movie-list-section">
-            <h2>Comedy Movies</h2>
-            <div class="movie-list" id="comedy-movies-list"></div>
+            <h2>Top Marvel Movies</h2>
+            <div class="movie-list" id="marvel-movies-list"></div>
         </section>
         <section class="movie-list-section">
-            <h2>Horror Movies</h2>
-            <div class="movie-list" id="horror-movies-list"></div>
-        </section>
-        <section class="movie-list-section">
-            <h2>Documentary Movies</h2>
-            <div class="movie-list" id="documentary-movies-list"></div>
+            <h2>Top Disney Movies</h2>
+            <div class="movie-list" id="disney-movies-list"></div>
         </section>
     </main>
-
+    <!-- Modal and search modal same as movies.html -->
     <div id="modal" class="modal">
         <div class="modal-content">
             <span class="close-button" onclick="closeModal()">&times;</span>
@@ -89,7 +94,6 @@
             </div>
         </div>
     </div>
-
     <div id="search-modal" class="modal">
         <div class="modal-content search-modal-content">
             <span class="close-button" onclick="closeSearchModal()">&times;</span>
@@ -100,7 +104,6 @@
             <div class="search-results" id="search-results"></div>
         </div>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>

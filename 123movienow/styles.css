@@ -34,25 +34,7 @@ header {
 }
 .search-btn:hover { background: #b0060f; }
 
-.banner {
-  width: 100%;
-  height: 350px;
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  align-items: flex-end;
-  position: relative;
-  margin-bottom: 40px;
-}
-.banner-content {
-  background: linear-gradient(90deg, rgba(24,24,24,0.9) 60%, rgba(0,0,0,0));
-  padding: 32px 48px;
-  width: 100%;
-}
-#banner-title {
-  font-size: 2.6rem;
-  font-weight: bold;
-  color: #fff;
+n
 }
 
 main {

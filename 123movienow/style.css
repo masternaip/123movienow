@@ -74,14 +74,13 @@ body {
 /* Banner */
 .banner {
     width: 100%;
-    height: 90vh; /* Adjust as needed */
+    height: 90vh;
     background-size: cover;
     background-position: center;
     display: flex;
     align-items: center;
     padding: 0 50px;
     position: relative;
-    /* Add transition for smoother banner image changes */
     transition: background-image 1s ease-in-out;
 }
 
@@ -99,7 +98,6 @@ body {
     position: relative;
     z-index: 1;
     max-width: 600px;
-    /* Add transition for smoother content changes */
     transition: opacity 0.5s ease-in-out;
 }
 
@@ -153,28 +151,27 @@ body {
 /* New: Banner Navigation Dots */
 .banner-nav-dots {
     position: absolute;
-    bottom: 20px; /* Position them at the bottom of the banner */
+    bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     gap: 10px;
-    z-index: 2; /* Ensure they are above other banner elements */
+    z-index: 2;
 }
 
 .dot {
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.5); /* Semi-transparent white */
+    background-color: rgba(255, 255, 255, 0.5);
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .dot.active {
-    background-color: var(--netflix-red); /* Active dot is red */
-    transform: scale(1.2); /* Slightly larger active dot */
+    background-color: var(--netflix-red);
+    transform: scale(1.2);
 }
-
 
 /* Movie Lists */
 .movie-list-section {
@@ -189,15 +186,15 @@ body {
 
 /* Updated movie-list to use Grid */
 .movie-list {
-    display: grid; /* Changed from flex */
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* Responsive columns */
-    gap: 15px; /* Gap between grid items */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 15px;
     padding-bottom: 10px;
 }
 
 .movie-list img {
-    width: 100%; /* Make image fill its grid cell */
-    height: 270px; /* Adjust poster height */
+    width: 100%;
+    height: 270px;
     object-fit: cover;
     border-radius: 5px;
     cursor: pointer;
@@ -206,20 +203,20 @@ body {
 
 .movie-list img:hover {
     transform: scale(1.05);
-    z-index: 10; /* Bring hovered item to front */
+    z-index: 10;
 }
 
 /* Modal */
 .modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1001; /* Sit on top */
+    display: none;
+    position: fixed;
+    z-index: 1001;
     left: 0;
     top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0,0,0,0.8); /* Black w/ opacity */
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.8);
     justify-content: center;
     align-items: center;
 }
@@ -271,7 +268,7 @@ body {
     width: 200px;
     height: auto;
     border-radius: 5px;
-    flex-shrink: 0; /* Prevent image from shrinking */
+    flex-shrink: 0;
 }
 
 .modal-text {
@@ -310,7 +307,7 @@ body {
 
 .modal-video-container {
     position: relative;
-    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    padding-bottom: 56.25%;
     height: 0;
     overflow: hidden;
     background-color: #000;
@@ -368,17 +365,17 @@ body {
 
 /* Updated search-results to use Grid */
 .search-results {
-    display: grid; /* Changed from flex */
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Responsive columns */
-    gap: 10px; /* Gap between grid items */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
     justify-content: center;
     max-height: 400px;
     overflow-y: auto;
-    padding-right: 10px; /* For scrollbar */
+    padding-right: 10px;
 }
 
 .search-results img {
-    width: 100%; /* Make image fill its grid cell */
+    width: 100%;
     height: 225px;
     object-fit: cover;
     border-radius: 5px;
@@ -397,7 +394,7 @@ body {
     }
 
     .nav-links {
-        display: none; /* Hide navigation links on smaller screens for simplicity */
+        display: none;
     }
 
     .logo img {
@@ -426,7 +423,6 @@ body {
         padding: 15px 20px;
     }
 
-    /* Adjust grid for smaller screens */
     .movie-list {
         grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     }
@@ -507,20 +503,20 @@ body {
         height: 150px;
     }
 }
-/* Add this to your style.css */
 
+/* Add this to your style.css */
 .page-title {
     font-size: 3rem;
-    padding: 100px 50px 20px; /* Adjust top padding to clear fixed header */
+    padding: 100px 50px 20px;
     color: var(--text-color);
 }
 
 .movies-page-main {
-    padding-top: 80px; /* Adjust main content padding to clear fixed header */
+    padding-top: 80px;
 }
 
 /* Style for active navigation link */
 .nav-links a.active {
     font-weight: bold;
-    color: var(--netflix-red); /* Highlight active link */
+    color: var(--netflix-red);
 }

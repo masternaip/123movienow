@@ -21,7 +21,6 @@
             </ul>
         </nav>
         <button class="search-icon" id="search-btn" aria-label="Open Search" onclick="openSearchModal()">
-            <!-- SVG icon here -->
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
                  stroke-linecap="round" stroke-linejoin="round" class="feather feather-search">
                 <circle cx="11" cy="11" r="8"/>
@@ -36,12 +35,10 @@
                 <h1 id="banner-title"></h1>
                 <p id="banner-description"></p>
                 <div class="banner-buttons">
-                    <button class="play-button" onclick="showDetails(currentItem)">
-                        <!-- Play SVG -->
+                    <button class="play-button" onclick="showDetails(window.currentItem)">
                         Play
                     </button>
-                    <button class="info-button" onclick="showDetails(currentItem)">
-                        <!-- Info SVG -->
+                    <button class="info-button" onclick="showDetails(window.currentItem)">
                         More Info
                     </button>
                 </div>
@@ -49,44 +46,42 @@
             <div class="banner-nav-dots" id="banner-nav-dots"></div>
         </section>
 
-        <!-- Movie/TV sections -->
         <section class="movie-list-section">
             <h2>Trending Movies</h2>
-            <div class="movie-list" id="movies-list" aria-live="polite"></div>
+            <div class="movie-list" id="movies-list"></div>
         </section>
 
         <section class="movie-list-section">
             <h2>Trending TV Shows</h2>
-            <div class="movie-list" id="tvshows-list" aria-live="polite"></div>
+            <div class="movie-list" id="tvshows-list"></div>
         </section>
 
         <section class="movie-list-section">
             <h2>Weekly Trend Movie</h2>
-            <div class="movie-list" id="weekly-trend-movie-list" aria-live="polite"></div>
+            <div class="movie-list" id="weekly-trend-movie-list"></div>
         </section>
 
         <section class="movie-list-section">
             <h2>Top HBO Movies</h2>
-            <div class="movie-list" id="hbo-movies-list" aria-live="polite"></div>
+            <div class="movie-list" id="hbo-movies-list"></div>
         </section>
 
         <section class="movie-list-section">
             <h2>Top Netflix Movies</h2>
-            <div class="movie-list" id="netflix-movies-list" aria-live="polite"></div>
+            <div class="movie-list" id="netflix-movies-list"></div>
         </section>
 
         <section class="movie-list-section">
             <h2>Top Marvel Movies</h2>
-            <div class="movie-list" id="marvel-movies-list" aria-live="polite"></div>
+            <div class="movie-list" id="marvel-movies-list"></div>
         </section>
 
         <section class="movie-list-section">
             <h2>Top Disney Movies</h2>
-            <div class="movie-list" id="disney-movies-list" aria-live="polite"></div>
+            <div class="movie-list" id="disney-movies-list"></div>
         </section>
     </main>
 
-    <!-- Movie/TV Details Modal -->
     <div id="modal" class="modal" aria-modal="true" tabindex="-1" role="dialog">
         <div class="modal-content">
             <button class="close-button" onclick="closeModal()" aria-label="Close Modal">&times;</button>
@@ -114,12 +109,11 @@
         </div>
     </div>
 
-    <!-- Search Modal -->
     <div id="search-modal" class="modal" aria-modal="true" tabindex="-1" role="dialog">
         <div class="modal-content search-modal-content">
             <button class="close-button" onclick="closeSearchModal()" aria-label="Close Search Modal">&times;</button>
             <div class="search-input-container">
-                <input type="text" id="search-input" placeholder="Search for movies or TV shows..." onkeyup="searchTMDB()" aria-label="Search Movies or TV Shows" />
+                <input type="text" id="search-input" placeholder="Search for movies or TV shows..." aria-label="Search Movies or TV Shows" />
                 <button onclick="searchTMDB()">Search</button>
             </div>
             <div class="search-results" id="search-results"></div>

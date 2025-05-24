@@ -1,33 +1,32 @@
-// ==== Configuration ====
-const API_KEY = 'a1e72fd93ed59f56e6332813b9f8dcae';
-// ==== CONFIG ====
+const API_KEY = 'a1e72fd93ed59f56e6332813b9f8dcae'; // Your TMDb API Key
+const BASE_URL = 'https://api.themoviedb.org/3';
+const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 
-// Genre IDs for TV
+// TMDb genre IDs for TV
 const GENRE_IDS = {
   action: 10759,      // Action & Adventure
-  horror: 9648,       // Mystery (closest for TV)
-  adventure: 10759,   // Action & Adventure (same as action)
+  horror: 9648,       // Mystery (closest match for 'Horror' TV)
+  adventure: 10759,   // Action & Adventure (no separate Adventure)
   drama: 18           // Drama
 };
 
-// ==== Fetch Functions ====
+// Fetch TV shows by category
 async function fetchTVShows(category) {
-  let url;
+  let url = '';
   if (category === 'trending') {
-    url = `https://api.themoviedb.org/3/trending/tv/week?api_key=${TMDB_API_KEY}`;
+    url = `${BASE_URL}/trending/tv/week?api_key=${API_KEY}`;
   } else {
-    url = `https://api.themoviedb.org/3/discover/tv?api_key=${TMDB_API_KEY}&with_genres=${GENRE_IDS[category]}&sort_by=popularity.desc`;
+    url = `${BASE_URL}/discover/tv?api_key=${API_KEY}&with_genres=${GENRE_IDS[category]}&sort_by=popularity.desc`;
   }
   const res = await fetch(url);
+  if (!res.ok) return []; // Return empty array if API fails
   const data = await res.json();
   return data.results || [];
 }
 
-// ==== Card Creator ====
+// Create a card for a TV show
 function createShowCard(show) {
-  const poster = show.poster_path
-    ? `https://image.tmdb.org/t/p/w300${show.poster_path}`
-    : 'https://via.placeholder.com/120x180?text=No+Image';
+  const poster = show.poster_path ? `${IMG_URL}${show.poster_path}` : 'https://via.placeholder.com/120x180?text=No+Image';
   const title = show.name || show.title || 'Untitled';
   return `
     <div class="tvshow-card" onclick="showDetails(${show.id}, 'tv')">
@@ -37,7 +36,7 @@ function createShowCard(show) {
   `;
 }
 
-// ==== Populate Sections ====
+// Load all TV show sections
 async function loadTVShows() {
   // Trending
   const trending = await fetchTVShows('trending');
@@ -60,22 +59,21 @@ async function loadTVShows() {
   document.getElementById('tvshows-drama').innerHTML = drama.map(createShowCard).join('');
 }
 
-// ==== Modal Logic (simplified for demo) ====
+// Show details in modal
 window.showDetails = async function(tvId, type) {
-  // Fetch details (or use your existing modal code)
-  // Here is a basic version as an example:
-  const url = `https://api.themoviedb.org/3/tv/${tvId}?api_key=${TMDB_API_KEY}`;
+  const url = `${BASE_URL}/tv/${tvId}?api_key=${API_KEY}`;
   const res = await fetch(url);
+  if (!res.ok) return;
   const show = await res.json();
 
   document.getElementById('modal-title').textContent = show.name || show.original_name || 'Untitled';
   document.getElementById('modal-description').textContent = show.overview || 'No description.';
   document.getElementById('modal-rating').textContent = `⭐ ${show.vote_average || 'N/A'}`;
   document.getElementById('modal-image').src = show.poster_path
-    ? `https://image.tmdb.org/t/p/w300${show.poster_path}`
+    ? `${IMG_URL}${show.poster_path}`
     : 'https://via.placeholder.com/160x240?text=No+Image';
 
-  // Hide video by default for TV (or implement your own logic)
+  // Hide video by default for TV (you can add trailer logic if you want)
   document.getElementById('modal-video').style.display = 'none';
 
   // Show modal
@@ -86,7 +84,7 @@ window.closeModal = function() {
   document.getElementById('modal').style.display = 'none';
 };
 
-// ==== Search Modal Logic ====
+// ==== SEARCH MODAL LOGIC ====
 window.openSearchModal = function() {
   document.getElementById('search-modal').style.display = 'flex';
   document.getElementById('search-input').focus();
@@ -100,7 +98,7 @@ window.closeSearchModal = function() {
 window.searchTMDB = async function() {
   const q = document.getElementById('search-input').value.trim();
   if (!q) return;
-  const url = `https://api.themoviedb.org/3/search/tv?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(q)}`;
+  const url = `${BASE_URL}/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(q)}`;
   const res = await fetch(url);
   const data = await res.json();
   const results = (data.results || []).slice(0, 12);
@@ -109,7 +107,7 @@ window.searchTMDB = async function() {
     : '<div style="color:#ccc;text-align:center;">No results found.</div>';
 };
 
-// ==== DOMContentLoaded ====
+// ==== INIT ====
 document.addEventListener('DOMContentLoaded', loadTVShows);
 
 // Optional: Close modals on ESC

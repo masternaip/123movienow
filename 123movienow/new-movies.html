@@ -6,26 +6,72 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <nav>
-    <ul>
-      <li><a href="index.html">Home</a></li>
-      <li><a href="tvshows.html">TV Shows</a></li>
-      <li><a href="new-movies.html">Movies</a></li>
-      <li><a href="new-movies.html">New & Popular</a></li>
-      <li><a href="mylist.html">My List</a></li>
-    </ul>
-  </nav>
-  <h1>New & Popular Movies</h1>
-  <div class="movie-list">
-    <div class="movie-card">
-      <img src="images/movie1.jpg" alt="Movie 1">
-      <h2>Movie Title 1</h2>
+  <header class="header">
+    <div class="logo">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Netflix_2015_logo.svg/1920px-Netflix_2015_logo.svg.png" alt="Netflix Logo">
     </div>
-    <div class="movie-card">
-      <img src="images/movie2.jpg" alt="Movie 2">
-      <h2>Movie Title 2</h2>
-    </div>
-    <!-- Add more movie cards as needed -->
+    <nav class="nav-links">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="tvshows.html">TV Shows</a></li>
+        <li><a href="movies.html">Movies</a></li>
+        <li><a href="new-movies.html">New & Popular</a></li>
+        <li><a href="mylist.html">My List</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <section class="movie-list-section">
+      <h2>New & Popular Movies</h2>
+      <div class="movie-list" id="new-popular-movies-list"></div>
+    </section>
+  </main>
+
+  <!-- Modal for movie details (copy from index.html) -->
+  <div id="modal" class="modal">
+      <div class="modal-content">
+          <span class="close-button" onclick="closeModal()">&times;</span>
+          <div class="modal-body">
+              <div class="modal-info">
+                  <img id="modal-image" src="" alt="Poster">
+                  <div class="modal-text">
+                      <h2 id="modal-title"></h2>
+                      <p id="modal-description"></p>
+                      <div class="modal-rating" id="modal-rating"></div>
+                      <div class="server-selection">
+                          <label for="server">Choose Server:</label>
+                          <select id="server" onchange="changeServer()">
+                              <option value="vidsrc.cc">vidsrc.cc</option>
+                              <option value="vidsrc.me">vidsrc.me</option>
+                              <option value="player.videasy.net">player.videasy.net</option>
+                          </select>
+                      </div>
+                  </div>
+              </div>
+              <div class="modal-video-container">
+                  <iframe id="modal-video" src="" frameborder="0" allowfullscreen></iframe>
+              </div>
+          </div>
+      </div>
   </div>
+
+  <script src="script.js"></script>
+  <script>
+    // Only display new/popular movies on this page
+    async function initNewMovies() {
+      // You can use fetchTrending, fetchWeeklyTrendingMovies, or any custom function from script.js
+      const movies = await fetchTrending('movie');
+      const weeklyTrendMovie = await fetchWeeklyTrendingMovies();
+      const combined = [
+        ...movies.slice(0, 12), // show 12 trending
+        ...weeklyTrendMovie.slice(0, 8) // show 8 weekly
+      ];
+      // Remove possible duplicates by movie id
+      const uniqueMovies = Array.from(new Map(combined.map(m => [m.id, m])).values());
+      displayList(uniqueMovies, 'new-popular-movies-list');
+    }
+    document.addEventListener('DOMContentLoaded', initNewMovies);
+  </script>
 </body>
 </html>

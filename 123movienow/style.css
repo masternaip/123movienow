@@ -113,7 +113,7 @@ h3 {
 .modal-info {
   display: flex;
   gap: 2rem;
-  align-items: start;
+  align-items: flex-start;
 }
 #modal-image {
   width: 150px;

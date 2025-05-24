@@ -524,4 +524,45 @@ body {
   width: 100%;
   border-radius: 4px;
 }
+    .header-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  width: 100%;
+}
+
+.logo img {
+  height: 48px;
+  margin-right: 32px;
+}
+
+.nav-links {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.nav-links ul {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  gap: 32px;
+}
+
+.nav-links li a {
+  color: #fff;              /* or your preferred color */
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 500;
+  padding: 8px 16px;
+  transition: color 0.2s;
+}
+
+.nav-links li a:hover {
+  color: #e50914;
+}
 }

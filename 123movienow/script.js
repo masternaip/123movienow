@@ -1,6 +1,6 @@
 const API_KEY = 'a1e72fd93ed59f56e6332813b9f8dcae';
 const BASE_URL = 'https://api.themoviedb.org/3';
-const IMG_URL = 'https://image.tmdb.org/t/p/w500';
+const IMG_URL = 'https://image.tmdb.org/t/p/w780';
 const PLACEHOLDER = 'https://via.placeholder.com/200x300?text=No+Image';
 let currentItem;
 
@@ -52,10 +52,12 @@ function displayBanner(item) {
   if (!item || !item.backdrop_path) {
     banner.style.background = '#333';
     document.getElementById('banner-title').textContent = item ? (item.title || item.name) : 'No Movie';
+    document.getElementById('banner-description').textContent = '';
     return;
   }
   banner.style.backgroundImage = `url(${IMG_URL}${item.backdrop_path})`;
   document.getElementById('banner-title').textContent = item.title || item.name;
+  document.getElementById('banner-description').textContent = item.overview ? item.overview : '';
 }
 
 function showBannerAt(index) {

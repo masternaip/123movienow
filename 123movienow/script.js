@@ -50,11 +50,11 @@ async function fetchMoviesByNetwork(networkId) {
   const data = await fetchJSON(networkUrl(networkId));
   return data.results;
 }
-async function fetchTvShowsByNetwork(networkId) {
+async function fetchtvshowsByNetwork(networkId) {
   const data = await fetchJSON(tvByNetworkUrl(networkId));
   return data.results;
 }
-async function fetchTvShowsByCompany(companyId) {
+async function fetchtvshowsByCompany(companyId) {
   const data = await fetchJSON(tvByCompanyUrl(companyId));
   return data.results;
 }

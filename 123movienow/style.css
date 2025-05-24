@@ -366,6 +366,59 @@ a { color: var(--netflix-red); text-decoration: none; }
   line-height: 1.36;
 }
 
+.site-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px 6px 32px;
+  background: #181818;
+}
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+.site-logo {
+  width: 38px;
+  height: 38px;
+  margin-right: 12px;
+}
+.site-title {
+  font-size: 1.6em;
+  font-weight: bold;
+  color: #e50914;
+  letter-spacing: 1px;
+}
+.site-nav {
+  display: flex;
+  gap: 34px;
+  align-items: center;
+}
+.site-nav a {
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.09em;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  position: relative;
+  padding: 4px 0;
+  transition: color 0.15s;
+}
+.site-nav a:hover, .site-nav a.active {
+  color: #e50914;
+}
+.site-nav a.active::after, .site-nav a:hover::after {
+  content: '';
+  display: block;
+  height: 2px;
+  background: #e50914;
+  border-radius: 2px;
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  right: 0;
+}
+
 /* === Responsive Design === */
 @media (max-width: 900px) {
   #banner { min-height: 200px; padding: 20px 12px; }

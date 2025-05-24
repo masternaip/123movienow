@@ -8,7 +8,6 @@ const FALLBACK_IMG = 'https://via.placeholder.com/300x450?text=No+Image';
 window.currentItem = null; // Used for server switching in modal
 
 // ==== Fetch Functions ====
-
 async function fetchFromTmdb(endpoint) {
   try {
     const res = await fetch(endpoint);
@@ -24,45 +23,14 @@ async function fetchFromTmdb(endpoint) {
 async function fetchTrending(type = 'movie') {
   return fetchFromTmdb(`${BASE_URL}/trending/${type}/week?api_key=${API_KEY}`);
 }
-
 async function fetchMoviesByCompany(companyId) {
   return fetchFromTmdb(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_companies=${companyId}&sort_by=popularity.desc`);
 }
-
 async function fetchMoviesByNetwork(networkId) {
   return fetchFromTmdb(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_networks=${networkId}&sort_by=popularity.desc`);
 }
 
-async function fetchTVByGenre(genreId) {
-  return fetchFromTmdb(`${BASE_URL}/discover/tv?api_key=${API_KEY}&with_genres=${genreId}&sort_by=popularity.desc`);
-}
-
-async function fetchPopularMovies() {
-  return fetchFromTmdb(`${BASE_URL}/movie/popular?api_key=${API_KEY}`);
-}
-
-async function fetchUpcomingMovies() {
-  return fetchFromTmdb(`${BASE_URL}/movie/upcoming?api_key=${API_KEY}`);
-}
-
-async function fetchNowPlayingMovies() {
-  return fetchFromTmdb(`${BASE_URL}/movie/now_playing?api_key=${API_KEY}`);
-}
-
-async function fetchMoviesByYear(year) {
-  return fetchFromTmdb(`${BASE_URL}/discover/movie?api_key=${API_KEY}&primary_release_year=${year}&sort_by=popularity.desc`);
-}
-
-async function fetchPopularTVShows() {
-  return fetchFromTmdb(`${BASE_URL}/tv/popular?api_key=${API_KEY}`);
-}
-
-async function fetchTrendingTVShows() {
-  return fetchFromTmdb(`${BASE_URL}/trending/tv/week?api_key=${API_KEY}`);
-}
-
 // ==== Render Functions ====
-
 function displayList(items, containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -83,7 +51,6 @@ function displayList(items, containerId) {
 }
 
 // ==== Modal Functions ====
-
 function showDetails(item) {
   window.currentItem = item;
   const modalTitle = document.getElementById('modal-title');
@@ -93,9 +60,7 @@ function showDetails(item) {
   const modalVideo = document.getElementById('modal-video');
   const modal = document.getElementById('modal');
   const serverSelect = document.getElementById('server');
-
   if (!modalTitle || !modalDesc || !modalRating || !modalImage || !modalVideo || !modal || !serverSelect) return;
-
   modalTitle.textContent = item.title || item.name || 'Untitled';
   modalDesc.textContent = item.overview || 'No description available.';
   modalRating.textContent = "⭐ " + (item.vote_average || "N/A");
@@ -104,12 +69,10 @@ function showDetails(item) {
     : item.backdrop_path 
       ? IMG_URL + item.backdrop_path 
       : FALLBACK_IMG;
-
   const server = serverSelect.value;
   const isMovie = !!item.title;
   const id = item.id;
   let embedUrl = '';
-
   if (isMovie) {
     embedUrl = `https://${server}/embed/movie?tmdb=${id}`;
   } else {
@@ -118,7 +81,6 @@ function showDetails(item) {
   modalVideo.src = embedUrl;
   modal.style.display = "flex";
 }
-
 function changeServer() {
   const server = document.getElementById('server')?.value;
   const item = window.currentItem;
@@ -134,7 +96,6 @@ function changeServer() {
   }
   modalVideo.src = embedUrl;
 }
-
 function closeModal() {
   const modal = document.getElementById('modal');
   const modalVideo = document.getElementById('modal-video');
@@ -152,6 +113,41 @@ document.getElementById('modal')?.addEventListener('click', function (e) {
   if (e.target === this) closeModal();
 });
 
-// ==== Example Usage ====
-// Example: Display popular movies on page load
-// fetchPopularMovies().then(movies => displayList(movies, 'movies-container'));
+// ==== Page Initialization ====
+// Populate all homepage sections after DOM loads
+window.addEventListener('DOMContentLoaded', async () => {
+  // Trending Movies
+  const movies = await fetchTrending('movie');
+  displayList(movies, 'movies-list');
+  // Trending TV Shows
+  const tvshows = await fetchTrending('tv');
+  displayList(tvshows, 'tvshows-list');
+  // Weekly Trend Movie (using trending movies again)
+  const weeklyTrendMovies = await fetchTrending('movie');
+  displayList(weeklyTrendMovies, 'weekly-trend-movie-list');
+  // Top HBO Movies (companyId: 3268)
+  const hboMovies = await fetchMoviesByCompany(3268);
+  displayList(hboMovies, 'hbo-movies-list');
+  // Top Netflix Movies (networkId: 213)
+  const netflixMovies = await fetchMoviesByNetwork(213);
+  displayList(netflixMovies, 'netflix-movies-list');
+  // Top Marvel Movies (companyId: 420)
+  const marvelMovies = await fetchMoviesByCompany(420);
+  displayList(marvelMovies, 'marvel-movies-list');
+  // Top Disney Movies (companyId: 2)
+  const disneyMovies = await fetchMoviesByCompany(2);
+  displayList(disneyMovies, 'disney-movies-list');
+});
+
+// ==== Search Modal Placeholders ====
+// You can implement your search modal logic here if needed
+function openSearchModal() {
+  document.getElementById('search-modal').style.display = 'flex';
+}
+function closeSearchModal() {
+  document.getElementById('search-modal').style.display = 'none';
+}
+function searchTMDB() {
+  // Placeholder for search logic
+  alert('Search functionality not implemented yet.');
+}

@@ -1,123 +1,162 @@
-const API_KEY = 'a1e72fd93ed59f56e6332813b9f8dcae';
-    const BASE_URL = 'https://api.themoviedb.org/3';
-    const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-    let currentItem;
-
-    async function fetchTrending(type) {
-      const res = await fetch(`${BASE_URL}/trending/${type}/week?api_key=${API_KEY}`);
-      const data = await res.json();
-      return data.results;
-    }
-
-    async function fetchTrendingAnime() {
-  let allResults = [];
-
-  // Fetch from multiple pages to get more anime (max 3 pages for demo)
-  for (let page = 1; page <= 3; page++) {
-    const res = await fetch(`${BASE_URL}/trending/tv/week?api_key=${API_KEY}&page=${page}`);
-    const data = await res.json();
-    const filtered = data.results.filter(item =>
-      item.original_language === 'ja' && item.genre_ids.includes(16)
-    );
-    allResults = allResults.concat(filtered);
-  }
-
-  return allResults;
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #141414;
+  color: #fff;
 }
 
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #212121;
+  padding: 1rem 2rem;
+}
 
-    function displayBanner(item) {
-      document.getElementById('banner').style.backgroundImage = `url(${IMG_URL}${item.backdrop_path})`;
-      document.getElementById('banner-title').textContent = item.title || item.name;
-    }
+header h1 {
+  margin: 0;
+  font-size: 2rem;
+}
 
-    function displayList(items, containerId) {
-      const container = document.getElementById(containerId);
-      container.innerHTML = '';
-      items.forEach(item => {
-        const img = document.createElement('img');
-        img.src = `${IMG_URL}${item.poster_path}`;
-        img.alt = item.title || item.name;
-        img.onclick = () => showDetails(item);
-        container.appendChild(img);
-      });
-    }
+header button {
+  background: #2d72d9;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5em 1.25em;
+  font-size: 1rem;
+  cursor: pointer;
+}
 
-    function showDetails(item) {
-      currentItem = item;
-      document.getElementById('modal-title').textContent = item.title || item.name;
-      document.getElementById('modal-description').textContent = item.overview;
-      document.getElementById('modal-image').src = `${IMG_URL}${item.poster_path}`;
-      document.getElementById('modal-rating').innerHTML = '★'.repeat(Math.round(item.vote_average / 2));
-      changeServer();
-      document.getElementById('modal').style.display = 'flex';
-    }
+section#banner {
+  height: 300px;
+  background: #222 center center/cover no-repeat;
+  display: flex;
+  align-items: end;
+  position: relative;
+  margin-bottom: 2rem;
+}
+#banner::after {
+  content: '';
+  position: absolute; left:0;top:0;right:0;bottom:0;
+  background: linear-gradient(0deg,#141414 20%,transparent 80%);
+}
+#banner-content {
+  position: relative;
+  z-index: 1;
+  padding: 2rem;
+}
+#banner-title {
+  font-size: 2.5rem;
+  margin: 0;
+  color: #fff;
+  text-shadow: 1px 1px 8px #141414;
+}
 
-    function changeServer() {
-      const server = document.getElementById('server').value;
-      const type = currentItem.media_type === "movie" ? "movie" : "tv";
-      let embedURL = "";
+main {
+  padding: 0 2rem 2rem 2rem;
+}
 
-      if (server === "vidsrc.cc") {
-        embedURL = `https://vidsrc.cc/v2/embed/${type}/${currentItem.id}`;
-      } else if (server === "vidsrc.me") {
-        embedURL = `https://vidsrc.net/embed/${type}/?tmdb=${currentItem.id}`;
-      } else if (server === "player.videasy.net") {
-        embedURL = `https://player.videasy.net/${type}/${currentItem.id}`;
-      }
+h3 {
+  margin-top: 2rem;
+  margin-bottom: .5rem;
+}
 
-      document.getElementById('modal-video').src = embedURL;
-    }
+.scroll-list {
+  display: flex;
+  overflow-x: auto;
+  gap: 1rem;
+  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+}
+.scroll-list img {
+  height: 200px;
+  border-radius: 8px;
+  transition: transform .2s;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  background: #333;
+  min-width: 130px;
+}
+.scroll-list img:hover {
+  transform: scale(1.06);
+}
 
-    function closeModal() {
-      document.getElementById('modal').style.display = 'none';
-      document.getElementById('modal-video').src = '';
-    }
+/* Modal styles */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left:0; top:0; width:100vw; height:100vh;
+  background: rgba(0,0,0,0.85);
+  align-items: center;
+  justify-content: center;
+}
+.modal-content {
+  background: #232323;
+  border-radius: 10px;
+  padding: 2rem;
+  min-width: 340px;
+  max-width: 700px;
+  width: 95vw;
+  box-shadow: 0 6px 36px #000a;
+  position: relative;
+}
+.close {
+  position: absolute;
+  right: 1.3rem;
+  top: 1.2rem;
+  font-size: 2rem;
+  color: #eee;
+  cursor: pointer;
+}
+.modal-info {
+  display: flex;
+  gap: 2rem;
+  align-items: start;
+}
+#modal-image {
+  width: 150px;
+  border-radius: 8px;
+  background: #333;
+}
+#modal-title {
+  margin: 0 0 .5rem 0;
+}
+#modal-description {
+  font-size: 1.1rem;
+  margin-bottom: 1em;
+}
+#modal-rating {
+  color: gold;
+  font-size: 1.3em;
+  margin-bottom: 1em;
+}
+#modal-video {
+  width: 100%;
+  margin-top: 1.5em;
+  border-radius: 8px;
+  min-height: 200px;
+  background: #111;
+}
 
-    function openSearchModal() {
-      document.getElementById('search-modal').style.display = 'flex';
-      document.getElementById('search-input').focus();
-    }
+/* Search Modal */
+#search-input {
+  width: 100%;
+  padding: .7em 1em;
+  font-size: 1.2em;
+  margin-bottom: 1em;
+  border: none;
+  border-radius: 6px;
+}
+#search-results {
+  margin-top: 1em;
+}
 
-    function closeSearchModal() {
-      document.getElementById('search-modal').style.display = 'none';
-      document.getElementById('search-results').innerHTML = '';
-    }
-
-    async function searchTMDB() {
-      const query = document.getElementById('search-input').value;
-      if (!query.trim()) {
-        document.getElementById('search-results').innerHTML = '';
-        return;
-      }
-
-      const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${query}`);
-      const data = await res.json();
-
-      const container = document.getElementById('search-results');
-      container.innerHTML = '';
-      data.results.forEach(item => {
-        if (!item.poster_path) return;
-        const img = document.createElement('img');
-        img.src = `${IMG_URL}${item.poster_path}`;
-        img.alt = item.title || item.name;
-        img.onclick = () => {
-          closeSearchModal();
-          showDetails(item);
-        };
-        container.appendChild(img);
-      });
-    }
-
-    async function init() {
-      const movies = await fetchTrending('movie');
-      const tvShows = await fetchTrending('tv');
-      const anime = await fetchTrendingAnime();
-
-      displayBanner(movies[Math.floor(Math.random() * movies.length)]);
-      displayList(movies, 'movies-list');
-      displayList(tvShows, 'tvshows-list');
-      displayList(anime, 'anime-list');
-    }
-
-    init();
+footer {
+  background: #181818;
+  color: #aaa;
+  text-align: center;
+  padding: 1.2rem 0;
+  font-size: 1em;
+}

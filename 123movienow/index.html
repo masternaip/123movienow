@@ -7,17 +7,20 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Header with Logo and Theme Switch -->
+  <!-- Header with Logo and Navigation Menu -->
   <header class="site-header">
     <div class="logo-container">
-      <!-- Inline SVG Logo -->
       <svg class="site-logo" width="38" height="38" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect width="44" height="44" rx="10" fill="#e50914"/>
         <text x="50%" y="55%" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="bold" dy=".3em">123</text>
       </svg>
       <span class="site-title">123MovieNow</span>
     </div>
-    <button class="theme-toggle" id="theme-toggle" title="Toggle Dark/Light Mode">🌙</button>
+    <nav class="site-nav">
+      <a href="movies.html">Movies</a>
+      <a href="new-movies.html">New Movies</a>
+      <a href="tvshows.html">TV Shows</a>
+    </nav>
   </header>
 
   <!-- Banner Section -->
@@ -103,25 +106,5 @@
   </button>
 
   <script src="script.js"></script>
-  <script>
-    // THEME TOGGLE LOGIC (in case your script.js doesn't have it yet)
-    const themeToggle = document.getElementById('theme-toggle');
-    if (themeToggle) {
-      if (localStorage.getItem('theme') === 'light') {
-        document.body.classList.add('light-mode');
-        themeToggle.textContent = '🌞';
-      }
-      themeToggle.onclick = function () {
-        document.body.classList.toggle('light-mode');
-        if (document.body.classList.contains('light-mode')) {
-          localStorage.setItem('theme', 'light');
-          themeToggle.textContent = '🌞';
-        } else {
-          localStorage.setItem('theme', 'dark');
-          themeToggle.textContent = '🌙';
-        }
-      };
-    }
-  </script>
 </body>
 </html>

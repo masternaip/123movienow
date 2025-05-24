@@ -6,7 +6,7 @@ let currentItem; // To store the currently selected item for modal details
 // New variables for banner slideshow
 let bannerItems = [];
 let currentBannerIndex = 0;
-let bannerInterval; // To hold the interval ID
+let bannerInterval;
 
 // Reusable fetch function for various movie lists
 async function fetchMovies(endpoint, queryParams = '') {
@@ -89,13 +89,11 @@ function startBannerSlideshow() {
     }, 8000); // Change banner every 8 seconds (adjust as needed)
 }
 
-
 // Function to display lists of movies/tv shows
 function displayList(items, containerId) {
     const container = document.getElementById(containerId);
     // Only proceed if the container element exists on the current page
     if (!container) {
-        // console.warn(`Container with ID '${containerId}' not found on this page.`);
         return;
     }
     container.innerHTML = ''; // Clear previous content
@@ -117,7 +115,7 @@ function showDetails(item) {
     document.getElementById('modal-image').src = `${IMG_URL}${item.poster_path}`;
     // Display star rating
     const rating = Math.round(item.vote_average / 2); // Convert 10-point scale to 5-star
-    document.getElementById('modal-rating').innerHTML = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+    document.getElementById('modal-rating').innerHTML = '\u2605'.repeat(rating) + '\u2606'.repeat(5 - rating);
     changeServer(); // Initialize video player with default server
     document.getElementById('modal').style.display = 'flex'; // Show the modal
 }
@@ -131,7 +129,7 @@ function changeServer() {
     if (server === "vidsrc.cc") {
         embedURL = `https://vidsrc.cc/v2/embed/${type}/${currentItem.id}`;
     } else if (server === "vidsrc.me") {
-        embedURL = `https://vidsrc.net/embed/${type}/?tmdb=${currentItem.id}`; // Note: vidsrc.me often uses 'net'
+        embedURL = `https://vidsrc.net/embed/${type}/?tmdb=${currentItem.id}`; // vidsrc.me often uses 'net'
     } else if (server === "player.videasy.net") {
         embedURL = `https://player.videasy.net/${type}/${currentItem.id}`;
     }
@@ -186,9 +184,8 @@ async function searchTMDB() {
     });
 }
 
-// New: Function to load content specific to the Movies page
+// Function to load content specific to the Movies page
 async function loadMoviesPageContent() {
-    console.log("Loading Movies Page Content...");
     // Common movie lists for the Movies page
     const popularMovies = await fetchMovies('movie/popular');
     const topRatedMovies = await fetchMovies('movie/top_rated');
@@ -211,9 +208,8 @@ async function loadMoviesPageContent() {
     displayList(documentaryMovies, 'documentary-movies-list');
 }
 
-// New: Function to load content specific to the Home page
+// Function to load content specific to the Home page
 async function loadHomePageContent() {
-    console.log("Loading Home Page Content...");
     const movies = await fetchMovies('trending/movie/day'); // Daily trending movies
     const tvShows = await fetchMovies('trending/tv/day'); // Daily trending TV shows
     const weeklyTrendMovie = await fetchMovies('trending/movie/week');
@@ -240,7 +236,6 @@ async function loadHomePageContent() {
     displayList(disneyMovies, 'disney-movies-list');
 }
 
-
 // Initialize function to load content based on the current page
 async function init() {
     // Add scroll event listener to header for background change (always relevant)
@@ -263,7 +258,6 @@ async function init() {
             link.classList.remove('active');
         }
     });
-
 
     if (currentPage === '' || currentPage === 'index.html') {
         loadHomePageContent();

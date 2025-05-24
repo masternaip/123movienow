@@ -2,29 +2,59 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>123MovieNow - Grid View</title>
+  <title>MovieFlix</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <h1>Movie Grid</h1>
-  <div class="movies">
-    <div class="movie-card">
-      <img src="https://via.placeholder.com/200x300?text=Movie+1" alt="Movie 1">
-      <h2>Movie 1</h2>
+  <header>
+    <div class="logo">MovieFlix</div>
+    <button id="search-btn" class="search-btn">Search</button>
+  </header>
+  <section id="banner" class="banner">
+    <div class="banner-content">
+      <h1 id="banner-title">Loading...</h1>
     </div>
-    <div class="movie-card">
-      <img src="https://via.placeholder.com/200x300?text=Movie+2" alt="Movie 2">
-      <h2>Movie 2</h2>
+  </section>
+
+  <main>
+    <h2>Trending Movies</h2>
+    <div id="movies-list" class="media-row"></div>
+    <h2>Trending TV Shows</h2>
+    <div id="tvshows-list" class="media-row"></div>
+    <h2>Trending Anime</h2>
+    <div id="anime-list" class="media-row"></div>
+  </main>
+
+  <!-- Modal for Movie Details -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span id="close-modal" class="close">&times;</span>
+      <div class="modal-info">
+        <img id="modal-image" src="" alt="Poster" class="modal-poster">
+        <div>
+          <h2 id="modal-title"></h2>
+          <div id="modal-rating" class="stars"></div>
+          <p id="modal-description"></p>
+          <label for="server">Choose server:</label>
+          <select id="server">
+            <option value="vidsrc.cc">vidsrc.cc</option>
+            <option value="vidsrc.me">vidsrc.me</option>
+            <option value="player.videasy.net">videasy.net</option>
+          </select>
+        </div>
+      </div>
+      <iframe id="modal-video" src="" frameborder="0" allowfullscreen class="modal-video"></iframe>
     </div>
-    <div class="movie-card">
-      <img src="https://via.placeholder.com/200x300?text=Movie+3" alt="Movie 3">
-      <h2>Movie 3</h2>
-    </div>
-    <div class="movie-card">
-      <img src="https://via.placeholder.com/200x300?text=Movie+4" alt="Movie 4">
-      <h2>Movie 4</h2>
-    </div>
-    <!-- Add more movie cards as needed -->
   </div>
-</body>
-</html>
+
+  <!-- Modal for Search -->
+  <div id="search-modal" class="modal">
+    <div class="modal-content search-modal-content">
+      <span id="close-search-modal" class="close">&times;</span>
+      <input id="search-input" type="text" placeholder="Search for movies, shows, anime..." autocomplete="off">
+      <div id="search-results" class="search-results"></div>
+    </div>
+  </div>
+
+  <script src="script.js
+

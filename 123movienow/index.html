@@ -2,12 +2,25 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>123MovieNow</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Banner -->
+  <!-- Header with Logo and Theme Switch -->
+  <header class="site-header">
+    <div class="logo-container">
+      <!-- Inline SVG Logo -->
+      <svg class="site-logo" width="38" height="38" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="44" height="44" rx="10" fill="#e50914"/>
+        <text x="50%" y="55%" text-anchor="middle" fill="#fff" font-family="Segoe UI, Arial, sans-serif" font-size="22" font-weight="bold" dy=".3em">123</text>
+      </svg>
+      <span class="site-title">123MovieNow</span>
+    </div>
+    <button class="theme-toggle" id="theme-toggle" title="Toggle Dark/Light Mode">🌙</button>
+  </header>
+
+  <!-- Banner Section -->
   <section id="banner">
     <div>
       <h1 id="banner-title"></h1>
@@ -20,7 +33,7 @@
     <div id="banner-nav-dots" class="banner-nav-dots"></div>
   </section>
 
-  <!-- Main Content -->
+  <!-- Main Content Sections -->
   <main>
     <h2 class="section-title">Trending Movies</h2>
     <div class="movies-list" id="movies-list"></div>
@@ -53,14 +66,12 @@
         <h2 id="modal-title"></h2>
         <div id="modal-rating"></div>
         <div id="modal-description"></div>
-
         <label for="server">Server:</label>
         <select id="server" onchange="changeServer()">
           <option value="vidsrc.cc">vidsrc.cc</option>
           <option value="vidsrc.me">vidsrc.me</option>
           <option value="player.videasy.net">videasy.net</option>
         </select>
-
         <div class="modal-video-container">
           <iframe id="modal-video" allowfullscreen></iframe>
           <div id="video-error-message">
@@ -83,14 +94,34 @@
     </div>
   </div>
 
-  <!-- Floating Search Button (optional) -->
-  <button 
-    onclick="openSearchModal()" 
+  <!-- Floating Search Button -->
+  <button
+    onclick="openSearchModal()"
     title="Search"
     style="position:fixed;bottom:24px;right:24px;z-index:1300;background:#e50914;color:#fff;font-size:1.6em;padding:12px 18px;border:none;border-radius:50%;box-shadow:0 2px 14px #000a;cursor:pointer;">
     🔍
   </button>
 
   <script src="script.js"></script>
+  <script>
+    // THEME TOGGLE LOGIC (in case your script.js doesn't have it yet)
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+      if (localStorage.getItem('theme') === 'light') {
+        document.body.classList.add('light-mode');
+        themeToggle.textContent = '🌞';
+      }
+      themeToggle.onclick = function () {
+        document.body.classList.toggle('light-mode');
+        if (document.body.classList.contains('light-mode')) {
+          localStorage.setItem('theme', 'light');
+          themeToggle.textContent = '🌞';
+        } else {
+          localStorage.setItem('theme', 'dark');
+          themeToggle.textContent = '🌙';
+        }
+      };
+    }
+  </script>
 </body>
 </html>

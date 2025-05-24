@@ -23,55 +23,88 @@
 
   <main>
     <section class="movie-list-section">
-      <h2>New & Popular Movies</h2>
-      <div class="movie-list" id="new-popular-movies-list"></div>
+      <h2>Popular Movies</h2>
+      <div class="movie-list" id="popular-movies-list"></div>
+    </section>
+    <section class="movie-list-section">
+      <h2>Upcoming Movies</h2>
+      <div class="movie-list" id="upcoming-movies-list"></div>
+    </section>
+    <section class="movie-list-section">
+      <h2>New Movies (Now Playing)</h2>
+      <div class="movie-list" id="nowplaying-movies-list"></div>
+    </section>
+    <section class="movie-list-section">
+      <h2>2025 Movies</h2>
+      <div class="movie-list" id="movies-2025-list"></div>
     </section>
   </main>
 
-  <!-- Modal for movie details (copy from index.html) -->
+  <!-- Modal for movie details -->
   <div id="modal" class="modal">
-      <div class="modal-content">
-          <span class="close-button" onclick="closeModal()">&times;</span>
-          <div class="modal-body">
-              <div class="modal-info">
-                  <img id="modal-image" src="" alt="Poster">
-                  <div class="modal-text">
-                      <h2 id="modal-title"></h2>
-                      <p id="modal-description"></p>
-                      <div class="modal-rating" id="modal-rating"></div>
-                      <div class="server-selection">
-                          <label for="server">Choose Server:</label>
-                          <select id="server" onchange="changeServer()">
-                              <option value="vidsrc.cc">vidsrc.cc</option>
-                              <option value="vidsrc.me">vidsrc.me</option>
-                              <option value="player.videasy.net">player.videasy.net</option>
-                          </select>
-                      </div>
-                  </div>
-              </div>
-              <div class="modal-video-container">
-                  <iframe id="modal-video" src="" frameborder="0" allowfullscreen></iframe>
-              </div>
+    <div class="modal-content">
+      <span class="close-button" onclick="closeModal()">&times;</span>
+      <div class="modal-body">
+        <div class="modal-info">
+          <img id="modal-image" src="" alt="Poster">
+          <div class="modal-text">
+            <h2 id="modal-title"></h2>
+            <p id="modal-description"></p>
+            <div class="modal-rating" id="modal-rating"></div>
+            <div class="server-selection">
+              <label for="server">Choose Server:</label>
+              <select id="server" onchange="changeServer()">
+                <option value="vidsrc.cc">vidsrc.cc</option>
+                <option value="vidsrc.me">vidsrc.me</option>
+                <option value="player.videasy.net">player.videasy.net</option>
+              </select>
+            </div>
           </div>
+        </div>
+        <div class="modal-video-container">
+          <iframe id="modal-video" src="" frameborder="0" allowfullscreen></iframe>
+        </div>
       </div>
+    </div>
   </div>
 
   <script src="script.js"></script>
   <script>
-    // Only display new/popular movies on this page
-    async function initNewMovies() {
-      // You can use fetchTrending, fetchWeeklyTrendingMovies, or any custom function from script.js
-      const movies = await fetchTrending('movie');
-      const weeklyTrendMovie = await fetchWeeklyTrendingMovies();
-      const combined = [
-        ...movies.slice(0, 12), // show 12 trending
-        ...weeklyTrendMovie.slice(0, 8) // show 8 weekly
-      ];
-      // Remove possible duplicates by movie id
-      const uniqueMovies = Array.from(new Map(combined.map(m => [m.id, m])).values());
-      displayList(uniqueMovies, 'new-popular-movies-list');
+    // Helper functions for each category, using TMDb API key/constants from script.js:
+    async function fetchPopularMovies() {
+      const res = await fetch(`${BASE_URL}/movie/popular?api_key=${API_KEY}`);
+      const data = await res.json();
+      return data.results;
     }
-    document.addEventListener('DOMContentLoaded', initNewMovies);
+    async function fetchUpcomingMovies() {
+      const res = await fetch(`${BASE_URL}/movie/upcoming?api_key=${API_KEY}`);
+      const data = await res.json();
+      return data.results;
+    }
+    async function fetchNowPlayingMovies() {
+      const res = await fetch(`${BASE_URL}/movie/now_playing?api_key=${API_KEY}`);
+      const data = await res.json();
+      return data.results;
+    }
+    async function fetch2025Movies() {
+      const res = await fetch(`${BASE_URL}/discover/movie?api_key=${API_KEY}&primary_release_year=2025&sort_by=popularity.desc`);
+      const data = await res.json();
+      return data.results;
+    }
+
+    async function initNewMoviesPage() {
+      const [popular, upcoming, nowplaying, movies2025] = await Promise.all([
+        fetchPopularMovies(),
+        fetchUpcomingMovies(),
+        fetchNowPlayingMovies(),
+        fetch2025Movies()
+      ]);
+      displayList(popular, 'popular-movies-list');
+      displayList(upcoming, 'upcoming-movies-list');
+      displayList(nowplaying, 'nowplaying-movies-list');
+      displayList(movies2025, 'movies-2025-list');
+    }
+    document.addEventListener('DOMContentLoaded', initNewMoviesPage);
   </script>
 </body>
 </html>

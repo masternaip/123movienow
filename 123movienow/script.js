@@ -1,120 +1,38 @@
 const API_KEY = 'a1e72fd93ed59f56e6332813b9f8dcae';
 const BASE_URL = 'https://api.themoviedb.org/3';
-const IMG_URL = 'https://image.tmdb.org/t/p/w780';
+const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 const PLACEHOLDER = 'https://via.placeholder.com/200x300?text=No+Image';
 let currentItem;
 
-// Banner rotation variables
-let bannerIndex = 0;
-let bannerItems = [];
-let bannerInterval;
-
-// Fetch trending movies or tv shows
-async function fetchTrending(type) {
-  try {
-    const res = await fetch(`${BASE_URL}/trending/${type}/week?api_key=${API_KEY}`);
-    const data = await res.json();
-    if (!data.results) return [];
-    return data.results.map(item => ({ ...item, media_type: type }));
-  } catch (err) {
-    console.error('Error fetching trending:', err);
-    return [];
-  }
-}
-
 // Fetch popular movies
-async function fetchPopularMovies() {
+async function fetchPopularMovies(page = 1) {
   try {
-    const res = await fetch(`${BASE_URL}/movie/popular?api_key=${API_KEY}`);
+    const res = await fetch(`${BASE_URL}/movie/popular?api_key=${API_KEY}&page=${page}`);
     const data = await res.json();
-    return data.results ? data.results.map(item => ({ ...item, media_type: 'movie' })) : [];
+    return data.results || [];
   } catch (err) {
-    console.error('Error fetching popular movies:', err);
+    console.error('Error fetching movies:', err);
     return [];
   }
 }
 
-// Fetch movies by company (Marvel, Disney, HBO, Paramount)
-async function fetchByCompany(companyId) {
-  try {
-    const res = await fetch(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_companies=${companyId}&sort_by=popularity.desc`);
-    const data = await res.json();
-    return data.results ? data.results.map(item => ({ ...item, media_type: 'movie' })) : [];
-  } catch (err) {
-    console.error(`Error fetching company ${companyId}:`, err);
-    return [];
-  }
-}
-
-// Banner display and rotation
-function displayBanner(item) {
-  const banner = document.getElementById('banner');
-  if (!item || !item.backdrop_path) {
-    banner.style.background = '#333';
-    document.getElementById('banner-title').textContent = item ? (item.title || item.name) : 'No Movie';
-    document.getElementById('banner-description').textContent = '';
-    return;
-  }
-  banner.style.backgroundImage = `url(${IMG_URL}${item.backdrop_path})`;
-  document.getElementById('banner-title').textContent = item.title || item.name;
-  document.getElementById('banner-description').textContent = item.overview ? item.overview : '';
-}
-
-function showBannerAt(index) {
-  if (!bannerItems.length) return;
-  bannerIndex = (index + bannerItems.length) % bannerItems.length;
-  displayBanner(bannerItems[bannerIndex]);
-}
-
-function nextBanner() {
-  showBannerAt(bannerIndex + 1);
-  resetBannerInterval();
-}
-
-function prevBanner() {
-  showBannerAt(bannerIndex - 1);
-  resetBannerInterval();
-}
-
-function startBannerRotation(items) {
-  if (!items.length) {
-    displayBanner({ title: 'No movies found' });
-    return;
-  }
-  bannerItems = items.filter(item => item.backdrop_path);
-  bannerIndex = 0;
-  showBannerAt(bannerIndex);
-
-  if (bannerInterval) clearInterval(bannerInterval);
-
-  bannerInterval = setInterval(() => {
-    showBannerAt(bannerIndex + 1);
-  }, 5000); // 5 seconds per banner
-}
-
-function resetBannerInterval() {
-  if (bannerInterval) clearInterval(bannerInterval);
-  bannerInterval = setInterval(() => {
-    showBannerAt(bannerIndex + 1);
-  }, 5000);
-}
-
-// Modal and search logic
+// Render movie posters
 function displayList(items, containerId) {
   const container = document.getElementById(containerId);
   container.innerHTML = '';
   items.forEach(item => {
     const img = document.createElement('img');
     img.src = item.poster_path ? `${IMG_URL}${item.poster_path}` : PLACEHOLDER;
-    img.alt = item.title || item.name || 'No Title';
+    img.alt = item.title || 'No Title';
     img.onclick = () => showDetails(item);
     container.appendChild(img);
   });
 }
 
+// Modal logic
 function showDetails(item) {
   currentItem = item;
-  document.getElementById('modal-title').textContent = item.title || item.name || '';
+  document.getElementById('modal-title').textContent = item.title || '';
   document.getElementById('modal-description').textContent = item.overview || 'No description available.';
   document.getElementById('modal-image').src = item.poster_path ? `${IMG_URL}${item.poster_path}` : PLACEHOLDER;
   document.getElementById('modal-rating').innerHTML = item.vote_average ? '★'.repeat(Math.round(item.vote_average / 2)) : 'No rating';
@@ -125,17 +43,13 @@ function showDetails(item) {
 function changeServer() {
   if (!currentItem) return;
   const server = document.getElementById('server').value;
-  let type = currentItem.media_type;
-  if (!type) {
-    type = currentItem.title ? 'movie' : 'tv';
-  }
   let embedURL = "";
   if (server === "vidsrc.cc") {
-    embedURL = `https://vidsrc.cc/v2/embed/${type}/${currentItem.id}`;
+    embedURL = `https://vidsrc.cc/v2/embed/movie/${currentItem.id}`;
   } else if (server === "vidsrc.me") {
-    embedURL = `https://vidsrc.net/embed/${type}/?tmdb=${currentItem.id}`;
+    embedURL = `https://vidsrc.net/embed/movie/?tmdb=${currentItem.id}`;
   } else if (server === "player.videasy.net") {
-    embedURL = `https://player.videasy.net/${type}/${currentItem.id}`;
+    embedURL = `https://player.videasy.net/movie/${currentItem.id}`;
   }
   document.getElementById('modal-video').src = embedURL;
 }
@@ -145,6 +59,7 @@ function closeModal() {
   document.getElementById('modal-video').src = '';
 }
 
+// Search logic for modal
 function openSearchModal() {
   document.getElementById('search-modal').style.display = 'flex';
   document.getElementById('search-input').focus();
@@ -201,31 +116,9 @@ window.onclick = function (e) {
   if (e.target === document.getElementById('search-modal')) closeSearchModal();
 };
 
-// Banner arrow listeners (waits for DOM ready)
-document.addEventListener('DOMContentLoaded', function() {
-  document.getElementById('banner-left').onclick = prevBanner;
-  document.getElementById('banner-right').onclick = nextBanner;
-});
-
-// Init
+// Init function for movie.html
 async function init() {
-  const movies = await fetchTrending('movie');
-  const tvShows = await fetchTrending('tv');
-  const popular = await fetchPopularMovies();
-  const marvel = await fetchByCompany(420);     // Marvel Studios
-  const disney = await fetchByCompany(2);       // Walt Disney Pictures
-  const hbo = await fetchByCompany(49);         // HBO
-  const paramount = await fetchByCompany(4);    // Paramount Pictures
-
-  // Banner: rotate through trending movies
-  startBannerRotation(movies);
-
-  displayList(movies, 'movies-list');
-  displayList(tvShows, 'tvshows-list');
-  displayList(popular, 'popular-list');
-  displayList(marvel, 'marvel-list');
-  displayList(disney, 'disney-list');
-  displayList(hbo, 'hbo-list');
-  displayList(paramount, 'paramount-list');
+  const movies = await fetchPopularMovies();
+  displayList(movies, 'all-movies-list');
 }
-init();
+document.addEventListener('DOMContentLoaded', init);

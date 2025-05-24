@@ -1,11 +1,16 @@
 // ==== Configuration ====
-const API_KEY = 'a1e72fd93ed59f56e6332813b9f8dcae'; // TMDb API Key
+const API_KEY = 'a1e72fd93ed59f56e6332813b9f8dcae';
 const BASE_URL = 'https://api.themoviedb.org/3';
-const IMG_URL = 'https://image.tmdb.org/t/p/w500';
+const IMG_URL = 'https://image.tmdb.org/t/p/w780';
 const FALLBACK_IMG = 'https://via.placeholder.com/300x450?text=No+Image';
 
-// ==== GLOBALS ====
-window.currentItem = null; // For modal & server switching
+// ==== Banner Rotation Globals ====
+let bannerMovies = [];
+let bannerIndex = 0;
+let bannerInterval = null;
+
+// ==== Modal State ====
+window.currentItem = null;
 
 // ==== Fetch Functions ====
 async function fetchFromTmdb(endpoint) {
@@ -28,6 +33,14 @@ async function fetchMoviesByCompany(companyId) {
 }
 async function fetchMoviesByNetwork(networkId) {
   return fetchFromTmdb(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_networks=${networkId}&sort_by=popularity.desc`);
+}
+async function searchTMDb(query) {
+  const movieResults = await fetchFromTmdb(`${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
+  const tvResults = await fetchFromTmdb(`${BASE_URL}/search/tv?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
+  // Add media_type for identification
+  movieResults.forEach(r => r.media_type = 'movie');
+  tvResults.forEach(r => r.media_type = 'tv');
+  return [...movieResults, ...tvResults];
 }
 
 // ==== Render Functions ====
@@ -65,7 +78,39 @@ function updateBanner(movie) {
         ? `url(${IMG_URL + movie.poster_path})`
         : 'none';
 
-  window.currentItem = movie; // So Play/Info buttons work
+  window.currentItem = movie;
+  updateBannerDots();
+}
+
+function updateBannerDots() {
+  const dotsContainer = document.getElementById('banner-nav-dots');
+  if (!dotsContainer) return;
+  dotsContainer.innerHTML = '';
+  bannerMovies.forEach((_, idx) => {
+    const dot = document.createElement('span');
+    dot.className = 'dot' + (idx === bannerIndex ? ' active' : '');
+    dot.onclick = () => showBannerAt(idx);
+    dotsContainer.appendChild(dot);
+  });
+}
+
+function showBannerAt(idx) {
+  if (bannerMovies.length === 0) return;
+  bannerIndex = idx;
+  updateBanner(bannerMovies[bannerIndex]);
+  restartBannerRotation();
+}
+
+function startBannerRotation() {
+  if (bannerInterval) clearInterval(bannerInterval);
+  bannerInterval = setInterval(() => {
+    if (bannerMovies.length === 0) return;
+    bannerIndex = (bannerIndex + 1) % bannerMovies.length;
+    updateBanner(bannerMovies[bannerIndex]);
+  }, 5000);
+}
+function restartBannerRotation() {
+  startBannerRotation();
 }
 
 // ==== Video Server Embed URL ====
@@ -124,65 +169,81 @@ function closeModal() {
   if (modal) modal.style.display = 'none';
   if (modalVideo) modalVideo.src = '';
 }
-
-// Optional: Show an error message if iframe fails to load (works only for some cases, not X-Frame-Options)
 document.getElementById('modal-video')?.addEventListener('error', function () {
   const errMsg = document.getElementById('video-error-message');
   if (errMsg) errMsg.style.display = 'block';
 });
-
-// Close modal on Escape key
 document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') closeModal();
 });
-
-// Close modal on clicking background
 document.getElementById('modal')?.addEventListener('click', function (e) {
   if (e.target === this) closeModal();
 });
 
 // ==== Page Initialization ====
 window.addEventListener('DOMContentLoaded', async () => {
-  // Trending Movies
-  const movies = await fetchTrending('movie');
-  displayList(movies, 'movies-list');
-  if (movies && movies.length > 0) {
-    updateBanner(movies[0]);
+  // Banner movies (Trending)
+  bannerMovies = await fetchTrending('movie');
+  if (bannerMovies && bannerMovies.length > 0) {
+    bannerIndex = 0;
+    updateBanner(bannerMovies[bannerIndex]);
+    startBannerRotation();
   }
-
-  // Trending TV Shows
+  const movies = bannerMovies;
+  displayList(movies, 'movies-list');
   const tvshows = await fetchTrending('tv');
   displayList(tvshows, 'tvshows-list');
-
-  // Weekly Trend Movie (using trending movies again)
-  const weeklyTrendMovies = await fetchTrending('movie');
-  displayList(weeklyTrendMovies, 'weekly-trend-movie-list');
-
-  // Top HBO Movies (companyId: 3268)
+  displayList(movies, 'weekly-trend-movie-list');
   const hboMovies = await fetchMoviesByCompany(3268);
   displayList(hboMovies, 'hbo-movies-list');
-
-  // Top Netflix Movies (networkId: 213)
   const netflixMovies = await fetchMoviesByNetwork(213);
   displayList(netflixMovies, 'netflix-movies-list');
-
-  // Top Marvel Movies (companyId: 420)
   const marvelMovies = await fetchMoviesByCompany(420);
   displayList(marvelMovies, 'marvel-movies-list');
-
-  // Top Disney Movies (companyId: 2)
   const disneyMovies = await fetchMoviesByCompany(2);
   displayList(disneyMovies, 'disney-movies-list');
 });
 
-// ==== Search Modal Placeholders ====
+// ==== Search Modal ====
 function openSearchModal() {
   document.getElementById('search-modal').style.display = 'flex';
+  document.getElementById('search-input').focus();
 }
 function closeSearchModal() {
   document.getElementById('search-modal').style.display = 'none';
+  document.getElementById('search-results').innerHTML = '';
 }
-function searchTMDB() {
-  // Placeholder for search logic
-  alert('Search functionality not implemented yet.');
+async function searchTMDB() {
+  const query = document.getElementById('search-input').value.trim();
+  const resultsDiv = document.getElementById('search-results');
+  if (!query) {
+    resultsDiv.innerHTML = '<p>Please enter a search term.</p>';
+    return;
+  }
+  resultsDiv.innerHTML = '<p>Searching...</p>';
+  const results = await searchTMDb(query);
+  if (!results.length) {
+    resultsDiv.innerHTML = '<p>No results found.</p>';
+    return;
+  }
+  resultsDiv.innerHTML = '';
+  results.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'search-result-item';
+    div.innerHTML = `
+      <img src="${item.poster_path ? IMG_URL + item.poster_path : FALLBACK_IMG}" alt="${item.title || item.name || 'Poster'}" />
+      <div>
+        <strong>${item.title || item.name || 'Untitled'}</strong> <span style="font-size:0.9em;color:#888;">(${item.media_type === 'movie' ? 'Movie' : 'TV'})</span>
+        <p style="font-size:0.95em;">${item.overview ? item.overview.substring(0, 120) + '...' : 'No description.'}</p>
+      </div>
+    `;
+    div.onclick = () => {
+      closeSearchModal();
+      showDetails(item);
+    };
+    resultsDiv.appendChild(div);
+  });
 }
+document.getElementById('search-input')?.addEventListener('keydown', function(e){
+  if(e.key === 'Enter') searchTMDB();
+});

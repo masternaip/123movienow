@@ -8,7 +8,7 @@
 }
 
 * {
-    margin: 0;
+    margin: 10;
     padding: 0;
     box-sizing: border-box;
 }
@@ -47,7 +47,7 @@ body {
 }
 
 .nav-links li {
-    margin-right: 500px;
+    margin-right: 20px;
 }
 
 .nav-links a {

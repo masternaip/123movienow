@@ -1,55 +1,113 @@
-const API_KEY = 'a1e72fd93ed59f56e6332813b9f8dcae';
+// --- CONFIG ---
+const API_KEY = 'a1e72fd93ed59f56e6332813b9f8dcae'; // Replace with your TMDB API Key
 const BASE_URL = 'https://api.themoviedb.org/3';
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 const PLACEHOLDER = 'https://via.placeholder.com/200x300?text=No+Image';
-let currentItem;
 
-// Fetch popular movies
-async function fetchPopularMovies(page = 1) {
-  try {
-    const res = await fetch(`${BASE_URL}/movie/popular?api_key=${API_KEY}&page=${page}`);
-    const data = await res.json();
-    return data.results || [];
-  } catch (err) {
-    console.error('Error fetching movies:', err);
-    return [];
-  }
+// --- Data Fetchers ---
+async function fetchTrending(type = 'movie') {
+  const res = await fetch(`${BASE_URL}/trending/${type}/week?api_key=${API_KEY}`);
+  const data = await res.json();
+  return data.results || [];
 }
 
-// Render movie posters
-function displayList(items, containerId) {
+async function fetchPopularMovies() {
+  const res = await fetch(`${BASE_URL}/movie/popular?api_key=${API_KEY}`);
+  const data = await res.json();
+  return data.results || [];
+}
+
+async function fetchByKeyword(keyword) {
+  const res = await fetch(`${BASE_URL}/search/keyword?api_key=${API_KEY}&query=${encodeURIComponent(keyword)}`);
+  const data = await res.json();
+  if (data.results && data.results.length > 0) {
+    const keywordId = data.results[0].id;
+    const res2 = await fetch(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_keywords=${keywordId}`);
+    const data2 = await res2.json();
+    return data2.results || [];
+  }
+  return [];
+}
+
+async function fetchMoviesByCompany(companyId) {
+  const res = await fetch(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_companies=${companyId}`);
+  const data = await res.json();
+  return data.results || [];
+}
+
+async function fetchMovieDetails(id, type = 'movie') {
+  const res = await fetch(`${BASE_URL}/${type}/${id}?api_key=${API_KEY}`);
+  return await res.json();
+}
+
+// --- Banner Logic ---
+let bannerItems = [];
+let currentBanner = 0;
+
+function showBanner(index) {
+  if (!bannerItems.length) return;
+  currentBanner = (index + bannerItems.length) % bannerItems.length;
+  const item = bannerItems[currentBanner];
+  const banner = document.getElementById('banner');
+  banner.style.backgroundImage = `url('${item.backdrop_path ? IMG_URL + item.backdrop_path : PLACEHOLDER}')`;
+  document.getElementById('banner-title').textContent = item.title || item.name || 'No Title';
+  document.getElementById('banner-description').textContent = item.overview || 'No description available.';
+  // Click banner to open modal
+  banner.onclick = () => showDetails(item, item.media_type || 'movie');
+}
+
+function nextBanner(n) {
+  showBanner(currentBanner + n);
+}
+
+// --- Render Media Rows ---
+function renderMediaRow(items, containerId, type = 'movie') {
   const container = document.getElementById(containerId);
   container.innerHTML = '';
   items.forEach(item => {
     const img = document.createElement('img');
-    img.src = item.poster_path ? `${IMG_URL}${item.poster_path}` : PLACEHOLDER;
-    img.alt = item.title || 'No Title';
-    img.onclick = () => showDetails(item);
+    img.src = item.poster_path ? IMG_URL + item.poster_path : PLACEHOLDER;
+    img.alt = item.title || item.name || '';
+    img.title = item.title || item.name || '';
+    img.onclick = () => showDetails(item, type);
     container.appendChild(img);
   });
 }
 
-// Modal logic
-function showDetails(item) {
+// --- Modal Logic ---
+let currentItem = null;
+let currentType = 'movie';
+
+function showDetails(item, type = 'movie') {
   currentItem = item;
-  document.getElementById('modal-title').textContent = item.title || '';
+  currentType = type;
+
+  document.getElementById('modal-title').textContent = item.title || item.name || '';
   document.getElementById('modal-description').textContent = item.overview || 'No description available.';
-  document.getElementById('modal-image').src = item.poster_path ? `${IMG_URL}${item.poster_path}` : PLACEHOLDER;
-  document.getElementById('modal-rating').innerHTML = item.vote_average ? '★'.repeat(Math.round(item.vote_average / 2)) : 'No rating';
+  document.getElementById('modal-image').src = item.poster_path ? IMG_URL + item.poster_path : PLACEHOLDER;
+
+  // Stars rating (0-10 TMDB to 0-5 stars)
+  let rating = item.vote_average ? Math.round(item.vote_average) / 2 : 0;
+  let stars = '★'.repeat(Math.round(rating)) + '☆'.repeat(5 - Math.round(rating));
+  document.getElementById('modal-rating').textContent = stars + (item.vote_average ? ` (${item.vote_average.toFixed(1)})` : '');
+
+  // Set video
   changeServer();
+
   document.getElementById('modal').style.display = 'flex';
 }
 
+// Streaming server selector
 function changeServer() {
   if (!currentItem) return;
   const server = document.getElementById('server').value;
-  let embedURL = "";
-  if (server === "vidsrc.cc") {
-    embedURL = `https://vidsrc.cc/v2/embed/movie/${currentItem.id}`;
-  } else if (server === "vidsrc.me") {
-    embedURL = `https://vidsrc.net/embed/movie/?tmdb=${currentItem.id}`;
-  } else if (server === "player.videasy.net") {
-    embedURL = `https://player.videasy.net/movie/${currentItem.id}`;
+  let embedURL = '';
+  if (server === 'vidsrc.cc') {
+    embedURL = `https://vidsrc.cc/v2/embed/${currentType}/${currentItem.id}`;
+  } else if (server === 'vidsrc.me') {
+    embedURL = `https://vidsrc.me/embed/${currentType}?tmdb=${currentItem.id}`;
+  } else if (server === 'player.videasy.net') {
+    embedURL = `https://player.videasy.net/${currentType}/${currentItem.id}`;
   }
   document.getElementById('modal-video').src = embedURL;
 }
@@ -59,7 +117,7 @@ function closeModal() {
   document.getElementById('modal-video').src = '';
 }
 
-// Search logic for modal
+// --- Search Modal Logic ---
 function openSearchModal() {
   document.getElementById('search-modal').style.display = 'flex';
   document.getElementById('search-input').focus();
@@ -71,6 +129,7 @@ function closeSearchModal() {
   document.getElementById('search-input').value = '';
 }
 
+// Search TMDB
 async function searchTMDB() {
   const query = document.getElementById('search-input').value;
   const container = document.getElementById('search-results');
@@ -82,30 +141,27 @@ async function searchTMDB() {
     const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
     const data = await res.json();
     container.innerHTML = '';
-    if (!data.results) {
-      const msg = document.createElement('div');
-      msg.textContent = 'No results found.';
-      container.appendChild(msg);
+    if (!data.results || !data.results.length) {
+      container.innerHTML = '<div>No results found.</div>';
       return;
     }
     data.results.forEach(item => {
       if (!item.poster_path) return;
       const img = document.createElement('img');
-      img.src = item.poster_path ? `${IMG_URL}${item.poster_path}` : PLACEHOLDER;
-      img.alt = item.title || item.name || 'No Title';
+      img.src = IMG_URL + item.poster_path;
+      img.alt = item.title || item.name || '';
       img.onclick = () => {
         closeSearchModal();
-        showDetails(item);
+        showDetails(item, item.media_type || 'movie');
       };
       container.appendChild(img);
     });
   } catch (err) {
-    console.error('Error searching TMDB:', err);
     container.innerHTML = '<div style="color:red">Failed to search movies.</div>';
   }
 }
 
-// Event Listeners
+// --- Event Listeners ---
 document.getElementById('search-btn').onclick = openSearchModal;
 document.getElementById('close-modal').onclick = closeModal;
 document.getElementById('close-search-modal').onclick = closeSearchModal;
@@ -115,10 +171,44 @@ window.onclick = function (e) {
   if (e.target === document.getElementById('modal')) closeModal();
   if (e.target === document.getElementById('search-modal')) closeSearchModal();
 };
+document.getElementById('banner-left').onclick = e => {
+  e.stopPropagation();
+  nextBanner(-1);
+};
+document.getElementById('banner-right').onclick = e => {
+  e.stopPropagation();
+  nextBanner(1);
+};
 
-// Init function for movie.html
+// --- INIT ---
 async function init() {
-  const movies = await fetchPopularMovies();
-  displayList(movies, 'all-movies-list');
+  // Trending
+  const trendingMovies = await fetchTrending('movie');
+  const trendingTV = await fetchTrending('tv');
+  renderMediaRow(trendingMovies, 'movies-list', 'movie');
+  renderMediaRow(trendingTV, 'tvshows-list', 'tv');
+
+  // Banner: use trending movies + tv
+  bannerItems = [...trendingMovies.slice(0, 5), ...trendingTV.slice(0, 5)];
+  showBanner(0);
+
+  // Popular
+  const popular = await fetchPopularMovies();
+  renderMediaRow(popular, 'popular-list', 'movie');
+
+  // Marvel (keyword)
+  const marvel = await fetchByKeyword('Marvel');
+  renderMediaRow(marvel, 'marvel-list', 'movie');
+
+  // Disney (company 2), HBO (2594), Paramount (4)
+  const disney = await fetchMoviesByCompany(2);
+  renderMediaRow(disney, 'disney-list', 'movie');
+
+  const hbo = await fetchMoviesByCompany(2594);
+  renderMediaRow(hbo, 'hbo-list', 'movie');
+
+  const paramount = await fetchMoviesByCompany(4);
+  renderMediaRow(paramount, 'paramount-list', 'movie');
 }
+
 document.addEventListener('DOMContentLoaded', init);

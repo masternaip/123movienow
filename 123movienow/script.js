@@ -4,6 +4,11 @@ const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 const PLACEHOLDER = 'https://via.placeholder.com/200x300?text=No+Image';
 let currentItem;
 
+// Banner rotation variables
+let bannerIndex = 0;
+let bannerItems = [];
+let bannerInterval;
+
 // Fetch trending movies or tv shows
 async function fetchTrending(type) {
   try {
@@ -41,6 +46,7 @@ async function fetchByCompany(companyId) {
   }
 }
 
+// Banner display and rotation
 function displayBanner(item) {
   const banner = document.getElementById('banner');
   if (!item || !item.backdrop_path) {
@@ -52,6 +58,46 @@ function displayBanner(item) {
   document.getElementById('banner-title').textContent = item.title || item.name;
 }
 
+function showBannerAt(index) {
+  if (!bannerItems.length) return;
+  bannerIndex = (index + bannerItems.length) % bannerItems.length;
+  displayBanner(bannerItems[bannerIndex]);
+}
+
+function nextBanner() {
+  showBannerAt(bannerIndex + 1);
+  resetBannerInterval();
+}
+
+function prevBanner() {
+  showBannerAt(bannerIndex - 1);
+  resetBannerInterval();
+}
+
+function startBannerRotation(items) {
+  if (!items.length) {
+    displayBanner({ title: 'No movies found' });
+    return;
+  }
+  bannerItems = items.filter(item => item.backdrop_path);
+  bannerIndex = 0;
+  showBannerAt(bannerIndex);
+
+  if (bannerInterval) clearInterval(bannerInterval);
+
+  bannerInterval = setInterval(() => {
+    showBannerAt(bannerIndex + 1);
+  }, 5000); // 5 seconds per banner
+}
+
+function resetBannerInterval() {
+  if (bannerInterval) clearInterval(bannerInterval);
+  bannerInterval = setInterval(() => {
+    showBannerAt(bannerIndex + 1);
+  }, 5000);
+}
+
+// Modal and search logic
 function displayList(items, containerId) {
   const container = document.getElementById(containerId);
   container.innerHTML = '';
@@ -153,6 +199,12 @@ window.onclick = function (e) {
   if (e.target === document.getElementById('search-modal')) closeSearchModal();
 };
 
+// Banner arrow listeners (waits for DOM ready)
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('banner-left').onclick = prevBanner;
+  document.getElementById('banner-right').onclick = nextBanner;
+});
+
 // Init
 async function init() {
   const movies = await fetchTrending('movie');
@@ -163,11 +215,9 @@ async function init() {
   const hbo = await fetchByCompany(49);         // HBO
   const paramount = await fetchByCompany(4);    // Paramount Pictures
 
-  if (movies.length > 0) {
-    displayBanner(movies[Math.floor(Math.random() * movies.length)]);
-  } else {
-    displayBanner({ title: 'No movies found' });
-  }
+  // Banner: rotate through trending movies
+  startBannerRotation(movies);
+
   displayList(movies, 'movies-list');
   displayList(tvShows, 'tvshows-list');
   displayList(popular, 'popular-list');

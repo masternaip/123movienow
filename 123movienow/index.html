@@ -1,125 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>123MovieNow – Netflix Clone</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23e50914' d='M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z'/></svg>">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>123MovieNow</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <header class="header" role="banner">
-        <div class="logo">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Netflix_2015_logo.svg/1920px-Netflix_2015_logo.svg.png" alt="Netflix Logo" />
-        </div>
-        <nav class="nav-links" aria-label="Main Navigation">
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="tvshows.html">TV Shows</a></li>
-                <li><a href="movies.html">Movies</a></li>
-                <li><a href="new-movies.html">New & Popular</a></li>
-            </ul>
-        </nav>
-        <button class="search-icon" id="search-btn" aria-label="Open Search" onclick="openSearchModal()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"
-                 stroke-linecap="round" stroke-linejoin="round" class="feather feather-search">
-                <circle cx="11" cy="11" r="8"/>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-            </svg>
-        </button>
-    </header>
-
-    <main>
-        <section class="banner" id="banner">
-            <div class="banner-content">
-                <h1 id="banner-title"></h1>
-                <p id="banner-description"></p>
-                <div class="banner-buttons">
-                    <button class="play-button" onclick="showDetails(window.currentItem)">
-                        Play
-                    </button>
-                    <button class="info-button" onclick="showDetails(window.currentItem)">
-                        More Info
-                    </button>
-                </div>
-            </div>
-            <div class="banner-nav-dots" id="banner-nav-dots"></div>
-        </section>
-
-        <section class="movie-list-section">
-            <h2>Trending Movies</h2>
-            <div class="movie-list" id="movies-list"></div>
-        </section>
-
-        <section class="movie-list-section">
-            <h2>Trending TV Shows</h2>
-            <div class="movie-list" id="tvshows-list"></div>
-        </section>
-
-        <section class="movie-list-section">
-            <h2>Weekly Trend Movie</h2>
-            <div class="movie-list" id="weekly-trend-movie-list"></div>
-        </section>
-
-        <section class="movie-list-section">
-            <h2>Top HBO Movies</h2>
-            <div class="movie-list" id="hbo-movies-list"></div>
-        </section>
-
-        <section class="movie-list-section">
-            <h2>Top Netflix Movies</h2>
-            <div class="movie-list" id="netflix-movies-list"></div>
-        </section>
-
-        <section class="movie-list-section">
-            <h2>Top Marvel Movies</h2>
-            <div class="movie-list" id="marvel-movies-list"></div>
-        </section>
-
-        <section class="movie-list-section">
-            <h2>Top Disney Movies</h2>
-            <div class="movie-list" id="disney-movies-list"></div>
-        </section>
-    </main>
-
-    <div id="modal" class="modal" aria-modal="true" tabindex="-1" role="dialog">
-        <div class="modal-content">
-            <button class="close-button" onclick="closeModal()" aria-label="Close Modal">&times;</button>
-            <div class="modal-body">
-                <div class="modal-info">
-                    <img id="modal-image" src="" alt="Poster" />
-                    <div class="modal-text">
-                        <h2 id="modal-title"></h2>
-                        <p id="modal-description"></p>
-                        <div class="modal-rating" id="modal-rating"></div>
-                        <div class="server-selection">
-                            <label for="server">Choose Server:</label>
-                            <select id="server" onchange="changeServer()">
-                                <option value="vidsrc.cc">vidsrc.cc</option>
-                                <option value="vidsrc.me">vidsrc.me</option>
-                                <option value="player.videasy.net">player.videasy.net</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-video-container">
-                    <iframe id="modal-video" src="" frameborder="0" allowfullscreen title="Streaming Video"></iframe>
-                </div>
-            </div>
-        </div>
+  <!-- Banner -->
+  <section id="banner">
+    <div>
+      <h1 id="banner-title"></h1>
+      <p id="banner-description"></p>
+      <div class="banner-buttons">
+        <button onclick="showDetails(window.currentItem)">Play</button>
+        <button class="info" onclick="showDetails(window.currentItem)">Info</button>
+      </div>
     </div>
+    <div id="banner-nav-dots" class="banner-nav-dots"></div>
+  </section>
 
-    <div id="search-modal" class="modal" aria-modal="true" tabindex="-1" role="dialog">
-        <div class="modal-content search-modal-content">
-            <button class="close-button" onclick="closeSearchModal()" aria-label="Close Search Modal">&times;</button>
-            <div class="search-input-container">
-                <input type="text" id="search-input" placeholder="Search for movies or TV shows..." aria-label="Search Movies or TV Shows" />
-                <button onclick="searchTMDB()">Search</button>
-            </div>
-            <div class="search-results" id="search-results"></div>
+  <!-- Main Content -->
+  <main>
+    <h2 class="section-title">Trending Movies</h2>
+    <div class="movies-list" id="movies-list"></div>
+
+    <h2 class="section-title">Trending TV Shows</h2>
+    <div class="tvshows-list" id="tvshows-list"></div>
+
+    <h2 class="section-title">Weekly Trend Movie</h2>
+    <div class="weekly-trend-movie-list" id="weekly-trend-movie-list"></div>
+
+    <h2 class="section-title">Top HBO Movies</h2>
+    <div class="hbo-movies-list" id="hbo-movies-list"></div>
+
+    <h2 class="section-title">Top Netflix Movies</h2>
+    <div class="netflix-movies-list" id="netflix-movies-list"></div>
+
+    <h2 class="section-title">Top Marvel Movies</h2>
+    <div class="marvel-movies-list" id="marvel-movies-list"></div>
+
+    <h2 class="section-title">Top Disney Movies</h2>
+    <div class="disney-movies-list" id="disney-movies-list"></div>
+  </main>
+
+  <!-- Modal for Movie/TV Info and Player -->
+  <div id="modal">
+    <div class="modal-content">
+      <button class="close-btn" onclick="closeModal()">&times;</button>
+      <img id="modal-image" src="" alt="Poster"/>
+      <div class="modal-details">
+        <h2 id="modal-title"></h2>
+        <div id="modal-rating"></div>
+        <div id="modal-description"></div>
+
+        <label for="server">Server:</label>
+        <select id="server" onchange="changeServer()">
+          <option value="vidsrc.cc">vidsrc.cc</option>
+          <option value="vidsrc.me">vidsrc.me</option>
+          <option value="player.videasy.net">videasy.net</option>
+        </select>
+
+        <div class="modal-video-container">
+          <iframe id="modal-video" allowfullscreen></iframe>
+          <div id="video-error-message">
+            Video server unavailable or blocked. Try another server or check back later.
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 
-    <script src="script.js"></script>
+  <!-- Search Modal -->
+  <div id="search-modal">
+    <div class="search-modal-content">
+      <button class="close-btn" style="position:absolute;top:10px;right:16px;font-size:2em;" onclick="closeSearchModal()">&times;</button>
+      <div class="search-input-container">
+        <input id="search-input" type="text" placeholder="Search movies or TV shows..." autocomplete="off" />
+        <button onclick="searchTMDB()">Search</button>
+      </div>
+      <div id="search-results" class="search-results"></div>
+    </div>
+  </div>
+
+  <!-- Floating Search Button (optional) -->
+  <button 
+    onclick="openSearchModal()" 
+    title="Search"
+    style="position:fixed;bottom:24px;right:24px;z-index:1300;background:#e50914;color:#fff;font-size:1.6em;padding:12px 18px;border:none;border-radius:50%;box-shadow:0 2px 14px #000a;cursor:pointer;">
+    🔍
+  </button>
+
+  <script src="script.js"></script>
 </body>
 </html>

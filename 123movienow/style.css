@@ -507,3 +507,20 @@ body {
         height: 150px;
     }
 }
+/* Add this to your style.css */
+
+.page-title {
+    font-size: 3rem;
+    padding: 100px 50px 20px; /* Adjust top padding to clear fixed header */
+    color: var(--text-color);
+}
+
+.movies-page-main {
+    padding-top: 80px; /* Adjust main content padding to clear fixed header */
+}
+
+/* Style for active navigation link */
+.nav-links a.active {
+    font-weight: bold;
+    color: var(--netflix-red); /* Highlight active link */
+}

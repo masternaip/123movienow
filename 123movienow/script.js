@@ -50,6 +50,24 @@ function displayList(items, containerId) {
   });
 }
 
+// ==== Banner Functions ====
+function updateBanner(movie) {
+  const banner = document.getElementById('banner');
+  const bannerTitle = document.getElementById('banner-title');
+  const bannerDesc = document.getElementById('banner-description');
+  if (!banner || !bannerTitle || !bannerDesc) return;
+
+  bannerTitle.textContent = movie.title || movie.name || 'Untitled';
+  bannerDesc.textContent = movie.overview || 'No description available.';
+  banner.style.backgroundImage = movie.backdrop_path
+      ? `url(${IMG_URL + movie.backdrop_path})`
+      : movie.poster_path
+        ? `url(${IMG_URL + movie.poster_path})`
+        : 'none';
+
+  window.currentItem = movie; // So Play/Info buttons work
+}
+
 // ==== Modal Functions ====
 function showDetails(item) {
   window.currentItem = item;
@@ -108,39 +126,46 @@ document.addEventListener('keydown', function (e) {
   if (e.key === 'Escape') closeModal();
 });
 
-// (Optional) Close modal on clicking background (if modal uses a backdrop)
+// Close modal on clicking background
 document.getElementById('modal')?.addEventListener('click', function (e) {
   if (e.target === this) closeModal();
 });
 
 // ==== Page Initialization ====
-// Populate all homepage sections after DOM loads
 window.addEventListener('DOMContentLoaded', async () => {
   // Trending Movies
   const movies = await fetchTrending('movie');
   displayList(movies, 'movies-list');
+  if (movies && movies.length > 0) {
+    updateBanner(movies[0]);
+  }
+
   // Trending TV Shows
   const tvshows = await fetchTrending('tv');
   displayList(tvshows, 'tvshows-list');
+
   // Weekly Trend Movie (using trending movies again)
   const weeklyTrendMovies = await fetchTrending('movie');
   displayList(weeklyTrendMovies, 'weekly-trend-movie-list');
+
   // Top HBO Movies (companyId: 3268)
   const hboMovies = await fetchMoviesByCompany(3268);
   displayList(hboMovies, 'hbo-movies-list');
+
   // Top Netflix Movies (networkId: 213)
   const netflixMovies = await fetchMoviesByNetwork(213);
   displayList(netflixMovies, 'netflix-movies-list');
+
   // Top Marvel Movies (companyId: 420)
   const marvelMovies = await fetchMoviesByCompany(420);
   displayList(marvelMovies, 'marvel-movies-list');
+
   // Top Disney Movies (companyId: 2)
   const disneyMovies = await fetchMoviesByCompany(2);
   displayList(disneyMovies, 'disney-movies-list');
 });
 
 // ==== Search Modal Placeholders ====
-// You can implement your search modal logic here if needed
 function openSearchModal() {
   document.getElementById('search-modal').style.display = 'flex';
 }

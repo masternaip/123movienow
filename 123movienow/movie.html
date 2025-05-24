@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Movies | MovieFlix</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Link to your CSS -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="logo">MovieFlix</div>
+    <div class="header-center">
+      <nav class="main-nav">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="movie.html" class="nav-link active">Movie</a>
+      </nav>
+    </div>
+    <button id="search-btn" class="search-btn">Search</button>
+  </header>
+
+  <main>
+    <h2>All Movies</h2>
+    <div id="all-movies-list" class="media-row"></div>
+  </main>
+
+  <!-- Modal for movie details (optional: copy from index.html if needed) -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span id="close-modal" class="close">&times;</span>
+      <div class="modal-info">
+        <img id="modal-image" class="modal-poster" src="" alt="Poster">
+        <div>
+          <h2 id="modal-title"></h2>
+          <div id="modal-rating" class="stars"></div>
+          <p id="modal-description"></p>
+          <label for="server">Choose Server:</label>
+          <select id="server">
+            <option value="vidsrc.cc">vidsrc.cc</option>
+            <option value="vidsrc.me">vidsrc.me</option>
+            <option value="player.videasy.net">videasy</option>
+          </select>
+        </div>
+      </div>
+      <iframe id="modal-video" class="modal-video" src="" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <div id="search-modal" class="modal">
+    <div class="search-modal-content">
+      <span id="close-search-modal" class="close">&times;</span>
+      <input type="text" id="search-input" placeholder="Search movies, TV shows...">
+      <div id="search-results" class="search-results"></div>
+    </div>
+  </div>
+
+  <!-- Link to your JS (optional: you can create a separate JS if you want different behavior) -->
+  <script src="script.js"></script>
+</body>
+</html>

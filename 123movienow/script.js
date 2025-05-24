@@ -134,57 +134,5 @@ function closeModal() {
 
 // Optional: Close modal on background click or Escape key
 document.addEventListener("keydown", function(e) {
-  if (e.key === "Escape") closeModal();
-});
-document.addEventListener("click", function(e) {
-  const modal = document.getElementById("modal");
-  if (e.target === modal) closeModal();
-});
-
-// ==== Page Initializers ====
-// (Call these in your HTML as needed, e.g. on DOMContentLoaded)
-
-// -- movies.html --
-async function initMoviesPage() {
-  const movies = await fetchTrending('movie');
-  const hboMovies = await fetchMoviesByCompany(3268);
-  const marvelMovies = await fetchMoviesByCompany(420);
-  const disneyMovies = await fetchMoviesByCompany(2);
-  const netflixMovies = await fetchMoviesByNetwork(213);
-
-  displayList(movies, 'movies-list');
-  displayList(hboMovies, 'hbo-movies-list');
-  displayList(marvelMovies, 'marvel-movies-list');
-  displayList(disneyMovies, 'disney-movies-list');
-  displayList(netflixMovies, 'netflix-movies-list');
-}
-
-// -- new-movies.html --
-async function initNewMoviesPage() {
-  const [popular, upcoming, nowplaying, movies2025] = await Promise.all([
-    fetchPopularMovies(),
-    fetchUpcomingMovies(),
-    fetchNowPlayingMovies(),
-    fetchMoviesByYear(2025)
-  ]);
-  displayList(popular, 'popular-movies-list');
-  displayList(upcoming, 'upcoming-movies-list');
-  displayList(nowplaying, 'nowplaying-movies-list');
-  displayList(movies2025, 'movies-2025-list');
-}
-
-// -- tvshows.html --
-async function initTVShowsPage() {
-  const [trending, popular, drama, action, romance] = await Promise.all([
-    fetchTrendingTVShows(),
-    fetchPopularTVShows(),
-    fetchTVByGenre(18),      // Drama
-    fetchTVByGenre(10759),   // Action & Adventure
-    fetchTVByGenre(10749)    // Romance
-  ]);
-  displayList(trending, 'trending-tvshows-list');
-  displayList(popular, 'popular-tvshows-list');
-  displayList(drama, 'drama-tvshows-list');
-  displayList(action, 'action-tvshows-list');
-  displayList(romance, 'romance-tvshows-list');
-}
+  if (e
+

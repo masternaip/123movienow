@@ -145,14 +145,18 @@ h2 {
   display: block;
 }
 
-/* Search Modal */
+/* Search Modal Responsive Styles */
 .search-modal-content {
   max-width: 600px;
   width: 96vw;
   text-align: center;
+  box-sizing: border-box;
+  padding: 20px 10px 24px 10px;
 }
+
 #search-input {
-  width: 88%;
+  width: 90%;
+  max-width: 480px;
   padding: 12px 10px;
   font-size: 1.1rem;
   margin-bottom: 18px;
@@ -160,12 +164,19 @@ h2 {
   border: none;
   background: #222;
   color: #fff;
+  box-sizing: border-box;
 }
+
+/* Responsive grid for search results */
 .search-results {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+  gap: 12px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
+
 .search-results img {
   width: 100%;
   border-radius: 6px;
@@ -174,6 +185,25 @@ h2 {
 }
 .search-results img:hover {
   transform: scale(1.08);
+}
+
+/* Make modal content full width on small screens */
+@media (max-width: 650px) {
+  .modal-content,
+  .search-modal-content {
+    max-width: 98vw;
+    width: 98vw;
+    padding: 10px 2vw 18px 2vw;
+  }
+  #search-input {
+    width: 98vw;
+    max-width: 98vw;
+    font-size: 1rem;
+  }
+  .search-results {
+    grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+    gap: 8px;
+  }
 }
 @media (max-width: 800px) {
   .modal-info { flex-direction: column; align-items: center;}

@@ -23,45 +23,70 @@
 
   <main>
     <section class="movie-list-section">
-      <h2>Movies</h2>
+      <h2>Movie Trend</h2>
       <div class="movie-list" id="movies-list"></div>
+    </section>
+    <section class="movie-list-section">
+      <h2>HBO</h2>
+      <div class="movie-list" id="hbo-movies-list"></div>
+    </section>
+    <section class="movie-list-section">
+      <h2>MARVEL</h2>
+      <div class="movie-list" id="marvel-movies-list"></div>
+    </section>
+    <section class="movie-list-section">
+      <h2>Disney</h2>
+      <div class="movie-list" id="disney-movies-list"></div>
+    </section>
+    <section class="movie-list-section">
+      <h2>Netflix</h2>
+      <div class="movie-list" id="netflix-movies-list"></div>
     </section>
   </main>
 
-  <!-- Modal for movie details (copied from index.html) -->
+  <!-- Modal for movie details -->
   <div id="modal" class="modal">
-      <div class="modal-content">
-          <span class="close-button" onclick="closeModal()">&times;</span>
-          <div class="modal-body">
-              <div class="modal-info">
-                  <img id="modal-image" src="" alt="Poster">
-                  <div class="modal-text">
-                      <h2 id="modal-title"></h2>
-                      <p id="modal-description"></p>
-                      <div class="modal-rating" id="modal-rating"></div>
-                      <div class="server-selection">
-                          <label for="server">Choose Server:</label>
-                          <select id="server" onchange="changeServer()">
-                              <option value="vidsrc.cc">vidsrc.cc</option>
-                              <option value="vidsrc.me">vidsrc.me</option>
-                              <option value="player.videasy.net">player.videasy.net</option>
-                          </select>
-                      </div>
-                  </div>
-              </div>
-              <div class="modal-video-container">
-                  <iframe id="modal-video" src="" frameborder="0" allowfullscreen></iframe>
-              </div>
+    <div class="modal-content">
+      <span class="close-button" onclick="closeModal()">&times;</span>
+      <div class="modal-body">
+        <div class="modal-info">
+          <img id="modal-image" src="" alt="Poster">
+          <div class="modal-text">
+            <h2 id="modal-title"></h2>
+            <p id="modal-description"></p>
+            <div class="modal-rating" id="modal-rating"></div>
+            <div class="server-selection">
+              <label for="server">Choose Server:</label>
+              <select id="server" onchange="changeServer()">
+                <option value="vidsrc.cc">vidsrc.cc</option>
+                <option value="vidsrc.me">vidsrc.me</option>
+                <option value="player.videasy.net">player.videasy.net</option>
+              </select>
+            </div>
           </div>
+        </div>
+        <div class="modal-video-container">
+          <iframe id="modal-video" src="" frameborder="0" allowfullscreen></iframe>
+        </div>
       </div>
+    </div>
   </div>
 
   <script src="script.js"></script>
   <script>
-    // Only display movies on this page
+    // Only display the relevant movie sections on this page
     async function initMoviesPage() {
       const movies = await fetchTrending('movie');
+      const hboMovies = await fetchMoviesByCompany(3268);     // HBO
+      const marvelMovies = await fetchMoviesByCompany(420);   // Marvel Studios
+      const disneyMovies = await fetchMoviesByCompany(2);     // Walt Disney Pictures
+      const netflixMovies = await fetchMoviesByNetwork(213);  // Netflix (network)
+
       displayList(movies, 'movies-list');
+      displayList(hboMovies, 'hbo-movies-list');
+      displayList(marvelMovies, 'marvel-movies-list');
+      displayList(disneyMovies, 'disney-movies-list');
+      displayList(netflixMovies, 'netflix-movies-list');
     }
     document.addEventListener('DOMContentLoaded', initMoviesPage);
   </script>

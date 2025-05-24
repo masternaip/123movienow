@@ -2,191 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Movies</title>
+  <title>TV Shows</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* Navigation and header fixes */
-    .header {
-      background: #141414;
-      padding: 0;
-      width: 100%;
-    }
-    .header-content {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 40px;
-      width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 16px 0;
-    }
-    .logo img {
-      height: 48px;
-      margin-right: 32px;
-      display: block;
-    }
-    .nav-links {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-    }
-    .nav-links ul {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      gap: 32px;
-    }
-    .nav-links li a {
-      color: #fff;
-      text-decoration: none;
-      font-size: 18px;
-      font-weight: 500;
-      padding: 8px 16px;
-      transition: color 0.2s;
-    }
-    .nav-links li a:hover {
-      color: #e50914;
-    }
-    /* Movie list styling */
-    .movie-list-section {
-      margin: 32px auto;
-      max-width: 1200px;
-      padding: 0 16px;
-    }
-    .movie-list-section h2 {
-      color: #fff;
-      margin-bottom: 16px;
-      font-weight: 600;
-    }
-    .movie-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-    }
-    .movie-list img {
-      width: 150px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: transform 0.2s;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-      background: #222;
-    }
-    .movie-list img:hover {
-      transform: scale(1.07);
-      box-shadow: 0 4px 16px #e50914;
-    }
-    /* Modal styling (copied from index.html, tweak as needed) */
-    .modal {
-      display: none;
-      position: fixed;
-      z-index: 9999;
-      left: 0; top: 0; width: 100vw; height: 100vh;
-      background: rgba(0,0,0,0.85);
-      align-items: center;
-      justify-content: center;
-    }
-    .modal-content {
-      background: #181818;
-      border-radius: 6px;
-      max-width: 800px;
-      width: 90vw;
-      padding: 24px;
-      position: relative;
-      color: #fff;
-      box-shadow: 0 8px 32px #111;
-      animation: fadeIn 0.3s;
-    }
-    .close-button {
-      position: absolute;
-      top: 12px; right: 18px;
-      font-size: 32px;
-      color: #fff;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .modal-body {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-    .modal-info {
-      display: flex;
-      gap: 24px;
-      align-items: flex-start;
-    }
-    #modal-image {
-      width: 180px;
-      border-radius: 6px;
-      background: #222;
-    }
-    .modal-text {
-      flex: 1;
-    }
-    .modal-text h2 {
-      margin: 0 0 10px 0;
-      font-size: 24px;
-      color: #e50914;
-    }
-    .modal-text p {
-      margin: 0 0 10px 0;
-      color: #ccc;
-    }
-    .modal-rating {
-      font-size: 20px;
-      margin-bottom: 10px;
-      color: #ffcc00;
-    }
-    .server-selection label {
-      color: #fff;
-      margin-right: 10px;
-    }
-    .server-selection select {
-      padding: 4px 12px;
-      border-radius: 4px;
-      border: 1px solid #333;
-      background: #222;
-      color: #fff;
-    }
-    .modal-video-container {
-      width: 100%;
-      aspect-ratio: 16/9;
-      background: #111;
-      border-radius: 6px;
-      overflow: hidden;
-    }
-    #modal-video {
-      width: 100%;
-      height: 100%;
-      border: none;
-      background: #000;
-    }
-    @media (max-width: 700px) {
-      .header-content, .movie-list-section {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 0 8px;
-      }
-      .movie-list {
-        justify-content: center;
-      }
-      .modal-info {
-        flex-direction: column;
-        align-items: center;
-      }
-      #modal-image {
-        width: 60vw;
-        max-width: 220px;
-      }
-    }
-    body {
-      background: #141414;
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-    }
+    /* You can remove this <style> block if all styles are already in style.css */
   </style>
 </head>
 <body>
@@ -208,28 +27,28 @@
 
   <main>
     <section class="movie-list-section">
-      <h2>Movie Trend</h2>
-      <div class="movie-list" id="movies-list"></div>
+      <h2>TV Show Trend</h2>
+      <div class="movie-list" id="tvshows-list"></div>
     </section>
     <section class="movie-list-section">
       <h2>HBO</h2>
-      <div class="movie-list" id="hbo-movies-list"></div>
+      <div class="movie-list" id="hbo-tvshows-list"></div>
     </section>
     <section class="movie-list-section">
       <h2>MARVEL</h2>
-      <div class="movie-list" id="marvel-movies-list"></div>
+      <div class="movie-list" id="marvel-tvshows-list"></div>
     </section>
     <section class="movie-list-section">
       <h2>Disney</h2>
-      <div class="movie-list" id="disney-movies-list"></div>
+      <div class="movie-list" id="disney-tvshows-list"></div>
     </section>
     <section class="movie-list-section">
       <h2>Netflix</h2>
-      <div class="movie-list" id="netflix-movies-list"></div>
+      <div class="movie-list" id="netflix-tvshows-list"></div>
     </section>
   </main>
 
-  <!-- Modal for movie details (copied from index.html) -->
+  <!-- Modal for TV show details -->
   <div id="modal" class="modal">
     <div class="modal-content">
       <span class="close-button" onclick="closeModal()">&times;</span>
@@ -252,27 +71,5 @@
         </div>
         <div class="modal-video-container">
           <iframe id="modal-video" src="" frameborder="0" allowfullscreen></iframe>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
-  <script>
-    async function initMoviesPage() {
-      const movies = await fetchTrending('movie');
-      const hboMovies = await fetchMoviesByCompany(3268);     // HBO
-      const marvelMovies = await fetchMoviesByCompany(420);   // Marvel Studios
-      const disneyMovies = await fetchMoviesByCompany(2);     // Walt Disney Pictures
-      const netflixMovies = await fetchMoviesByNetwork(213);  // Netflix (network)
-
-      displayList(movies, 'movies-list');
-      displayList(hboMovies, 'hbo-movies-list');
-      displayList(marvelMovies, 'marvel-movies-list');
-      displayList(disneyMovies, 'disney-movies-list');
-      displayList(netflixMovies, 'netflix-movies-list');
-    }
-    document.addEventListener('DOMContentLoaded', initMoviesPage);
-  </script>
-</body>
-</html>
+        </*
+

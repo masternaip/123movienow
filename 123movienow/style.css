@@ -404,6 +404,24 @@ a { color: var(--netflix-red); text-decoration: none; }
   padding: 4px 0;
   transition: color 0.15s;
 }
+.tvshows-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 18px;
+  padding: 0 16px 18px 16px;
+  justify-items: center;
+}
+.tvshows-list img {
+  width: 120px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px #0005;
+  cursor: pointer;
+  transition: transform 0.23s, box-shadow 0.23s;
+  background: #444;
+  border: 2px solid #181818;
+}
 .site-nav a:hover, .site-nav a.active {
   color: #e50914;
 }

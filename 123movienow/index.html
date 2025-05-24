@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Simple Movie Website</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>🎬 Movie Explorer</h1>
+    <button id="search-btn">🔍 Search</button>
+  </header>
+
+  <section id="banner">
+    <div id="banner-content">
+      <h2 id="banner-title"></h2>
+    </div>
+  </section>
+
+  <main>
+    <h3>Trending Movies</h3>
+    <div class="scroll-list" id="movies-list"></div>
+
+    <h3>Trending TV Shows</h3>
+    <div class="scroll-list" id="tvshows-list"></div>
+
+    <h3>Trending Anime</h3>
+    <div class="scroll-list" id="anime-list"></div>
+  </main>
+
+  <!-- Details Modal -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="close-modal">&times;</span>
+      <div class="modal-info">
+        <img id="modal-image" src="" alt="" />
+        <div>
+          <h2 id="modal-title"></h2>
+          <p id="modal-description"></p>
+          <p id="modal-rating"></p>
+          <label>Server:
+            <select id="server">
+              <option value="vidsrc.cc">vidsrc.cc</option>
+              <option value="vidsrc.me">vidsrc.me</option>
+              <option value="player.videasy.net">videasy.net</option>
+            </select>
+          </label>
+        </div>
+      </div>
+      <iframe id="modal-video" width="100%" height="360" frameborder="0" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <!-- Search Modal -->
+  <div id="search-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" id="close-search-modal">&times;</span>
+      <h3>Search Movies, TV Shows, Anime</h3>
+      <input type="text" id="search-input" placeholder="Type to search..." autocomplete="off">
+      <div class="scroll-list" id="search-results"></div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Powered by TMDB API | &copy; 2025 Movie Explorer</p>
+  </footer>
+  <script src="main.js"></script>
+</body>
+</html>

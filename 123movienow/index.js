@@ -1,51 +1,53 @@
 // index.js
-// This file contains JavaScript specific to the homepage (index.html).
+// This file contains JavaScript logic specific to the homepage (index.html).
 
-// Global variables from global.js are available via window object
-// const API_KEY = window.API_KEY; // Not needed if fetchMedia is used
-// const BASE_URL = window.BASE_URL; // Not needed if fetchMedia is used
-const IMG_URL = window.IMG_URL; // Used for banner image
-let currentItem = window.currentItem; // Re-declare or ensure it's accessible
+// Access global variables and functions via the window object (defined in global.js)
+const IMG_URL = window.IMG_URL;
+let currentItem = window.currentItem; // This will be updated by showDetails in global.js
 
 let bannerItems = [];
 let currentBannerIndex = 0;
 let bannerInterval;
 
-// Function to display the main banner
+/**
+ * Displays the main banner with details of a media item.
+ * @param {Object} item - The media object (movie or TV show) for the banner.
+ */
 function displayBanner(item) {
     const bannerElement = document.getElementById('banner');
     const bannerTitle = document.getElementById('banner-title');
     const bannerDescription = document.getElementById('banner-description');
 
+    // Only proceed if banner elements exist (specific to index.html)
     if (!bannerElement || !bannerTitle || !bannerDescription) {
-        return; // Ensure elements exist on this page
+        return;
     }
 
-    // Apply fade-out effect
+    // Smooth fade effect for banner content
     bannerElement.style.opacity = 0;
     bannerTitle.style.opacity = 0;
     bannerDescription.style.opacity = 0;
 
-    // After fade-out, change content and fade in
     setTimeout(() => {
         bannerElement.style.backgroundImage = `url(${IMG_URL}${item.backdrop_path})`;
-        bannerTitle.textContent = item.title || item.name || 'N/A';
+        bannerTitle.textContent = item.title || item.name || 'Untitled';
         bannerDescription.textContent = item.overview || 'No overview available.';
-        window.currentItem = item; // Update global currentItem
-        currentItem = item; // Also update local currentItem if needed
+        window.currentItem = item; // Update the global currentItem when banner changes
+        currentItem = item; // Update local currentItem for direct access in this script if needed
 
-        // Apply fade-in effect
         bannerElement.style.opacity = 1;
         bannerTitle.style.opacity = 1;
         bannerDescription.style.opacity = 1;
-    }, 500); // Half of the transition duration in CSS
+    }, 500); // Matches CSS transition duration
 }
 
-// Function to update active dot for banner slideshow
+/**
+ * Updates the navigation dots for the banner slideshow.
+ */
 function updateBannerDots() {
     const dotsContainer = document.getElementById('banner-nav-dots');
     if (!dotsContainer) {
-        return; // Ensure dots container exists on this page
+        return;
     }
 
     dotsContainer.innerHTML = ''; // Clear existing dots
@@ -57,7 +59,7 @@ function updateBannerDots() {
             dot.classList.add('active');
         }
         dot.onclick = () => {
-            clearInterval(bannerInterval); // Stop current interval
+            clearInterval(bannerInterval); // Stop current interval on manual click
             currentBannerIndex = index;
             displayBanner(bannerItems[currentBannerIndex]);
             updateBannerDots();
@@ -67,13 +69,15 @@ function updateBannerDots() {
     });
 }
 
-// Function to start the banner slideshow
+/**
+ * Starts the automatic banner slideshow.
+ */
 function startBannerSlideshow() {
-    if (!document.getElementById('banner')) {
-        return; // Only start if banner elements exist
+    if (!document.getElementById('banner')) { // Ensure banner exists
+        return;
     }
 
-    clearInterval(bannerInterval); // Clear any existing interval
+    clearInterval(bannerInterval); // Clear any existing interval to prevent duplicates
 
     bannerInterval = setInterval(() => {
         currentBannerIndex = (currentBannerIndex + 1) % bannerItems.length;
@@ -82,31 +86,36 @@ function startBannerSlideshow() {
     }, 8000); // Change banner every 8 seconds
 }
 
-// Function to load content specific to the Home page
+/**
+ * Loads all content specific to the Home page.
+ */
 async function loadHomePageContent() {
     console.log("Loading Home Page Content...");
 
-    // Fetching data using the global fetchMedia function
-    const movies = await window.fetchMedia('trending/movie/day');
-    const tvShows = await window.fetchMedia('trending/tv/day');
+    // Fetch data using the globally available fetchMedia function
+    const dailyTrendingMovies = await window.fetchMedia('trending/movie/day');
+    const dailyTrendingTvShows = await window.fetchMedia('trending/tv/day');
     const weeklyTrendMovie = await window.fetchMedia('trending/movie/week');
 
-    // Production Company/Network based lists (using IDs from previous searches)
+    // Fetch movies by production company/network
     const hboMovies = await window.fetchMedia('discover/movie', '&with_companies=3268&sort_by=popularity.desc'); // HBO
     const netflixMovies = await window.fetchMedia('discover/movie', '&with_networks=213&sort_by=popularity.desc'); // Netflix
     const marvelMovies = await window.fetchMedia('discover/movie', '&with_companies=420&sort_by=popularity.desc'); // Marvel Studios
     const disneyMovies = await window.fetchMedia('discover/movie', '&with_companies=2&sort_by=popularity.desc'); // Walt Disney Pictures
 
-    // Populate bannerItems with a mix of daily trending movies and TV shows
-    bannerItems = [...movies.slice(0, 5), ...tvShows.slice(0, 5)];
+    // Populate bannerItems with a mix of daily trending movies and TV shows for variety
+    // Ensure we have enough items before slicing
+    bannerItems = [...dailyTrendingMovies.slice(0, 5), ...dailyTrendingTvShows.slice(0, 5)];
     if (bannerItems.length > 0) {
         displayBanner(bannerItems[currentBannerIndex]);
         updateBannerDots();
         startBannerSlideshow();
+    } else {
+        console.warn("No items available for banner slideshow.");
     }
 
-    // Display lists using the global displayList function
-    window.displayList(tvShows, 'tvshows-list');
+    // Display lists using the globally available displayList function
+    window.displayList(dailyTrendingTvShows, 'tvshows-list');
     window.displayList(weeklyTrendMovie, 'weekly-trend-movie-list');
     window.displayList(hboMovies, 'hbo-movies-list');
     window.displayList(netflixMovies, 'netflix-movies-list');
@@ -114,9 +123,9 @@ async function loadHomePageContent() {
     window.displayList(disneyMovies, 'disney-movies-list');
 }
 
-// Initialize function for homepage
+// Initialize function when the DOM is fully loaded for the homepage
 document.addEventListener('DOMContentLoaded', () => {
-    // Add scroll event listener to header for background change
+    // Add scroll event listener to header for background change (relevant to both pages)
     window.addEventListener('scroll', () => {
         const header = document.querySelector('.header');
         if (window.scrollY > 50) {
@@ -126,14 +135,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Highlight active nav link (specific to index.html)
+    // Highlight the active navigation link for the homepage
     document.querySelectorAll('.nav-links a').forEach(link => {
-        if (link.getAttribute('href') === 'index.html' || link.getAttribute('href') === '') {
+        // Check if the href is 'index.html' or an empty string (for root path)
+        const currentPath = window.location.pathname.split('/').pop();
+        if (link.getAttribute('href') === 'index.html' || (link.getAttribute('href') === '' && currentPath === '')) {
             link.classList.add('active');
         } else {
             link.classList.remove('active');
         }
     });
 
-    loadHomePageContent();
+    loadHomePageContent(); // Load homepage specific content
 });

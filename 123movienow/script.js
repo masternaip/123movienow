@@ -1,11 +1,11 @@
 // ==== Configuration ====
-const API_KEY = 'a1e72fd93ed59f56e6332813b9f8dcae'; // Your TMDb API Key
+const API_KEY = 'a1e72fd93ed59f56e6332813b9f8dcae'; // TMDb API Key
 const BASE_URL = 'https://api.themoviedb.org/3';
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 const FALLBACK_IMG = 'https://via.placeholder.com/300x450?text=No+Image';
 
 // ==== GLOBALS ====
-window.currentItem = null; // Used for server switching in modal
+window.currentItem = null; // For modal & server switching
 
 // ==== Fetch Functions ====
 async function fetchFromTmdb(endpoint) {
@@ -68,6 +68,23 @@ function updateBanner(movie) {
   window.currentItem = movie; // So Play/Info buttons work
 }
 
+// ==== Video Server Embed URL ====
+function getEmbedURL(server, currentItem) {
+  const type = currentItem.media_type
+    ? (currentItem.media_type === "movie" ? "movie" : "tv")
+    : (currentItem.title ? "movie" : "tv");
+
+  let embedURL = "";
+  if (server === "vidsrc.cc") {
+    embedURL = `https://vidsrc.cc/v2/embed/${type}/${currentItem.id}`;
+  } else if (server === "vidsrc.me" || server === "vidsrc.net") {
+    embedURL = `https://vidsrc.net/embed/${type}/?tmdb=${currentItem.id}`;
+  } else if (server === "player.videasy.net") {
+    embedURL = `https://player.videasy.net/${type}/${currentItem.id}`;
+  }
+  return embedURL;
+}
+
 // ==== Modal Functions ====
 function showDetails(item) {
   window.currentItem = item;
@@ -87,32 +104,19 @@ function showDetails(item) {
     : item.backdrop_path 
       ? IMG_URL + item.backdrop_path 
       : FALLBACK_IMG;
+
   const server = serverSelect.value;
-  const isMovie = !!item.title;
-  const id = item.id;
-  let embedUrl = '';
-  if (isMovie) {
-    embedUrl = `https://${server}/embed/movie?tmdb=${id}`;
-  } else {
-    embedUrl = `https://${server}/embed/tv?tmdb=${id}`;
-  }
-  modalVideo.src = embedUrl;
+  modalVideo.src = getEmbedURL(server, item);
+  document.getElementById('video-error-message')?.style.setProperty('display', 'none');
   modal.style.display = "flex";
 }
+
 function changeServer() {
-  const server = document.getElementById('server')?.value;
-  const item = window.currentItem;
+  const server = document.getElementById('server').value;
   const modalVideo = document.getElementById('modal-video');
-  if (!server || !item || !modalVideo) return;
-  const isMovie = !!item.title;
-  const id = item.id;
-  let embedUrl = '';
-  if (isMovie) {
-    embedUrl = `https://${server}/embed/movie?tmdb=${id}`;
-  } else {
-    embedUrl = `https://${server}/embed/tv?tmdb=${id}`;
-  }
-  modalVideo.src = embedUrl;
+  if (!window.currentItem || !modalVideo) return;
+  modalVideo.src = getEmbedURL(server, window.currentItem);
+  document.getElementById('video-error-message')?.style.setProperty('display', 'none');
 }
 function closeModal() {
   const modal = document.getElementById('modal');
@@ -120,6 +124,12 @@ function closeModal() {
   if (modal) modal.style.display = 'none';
   if (modalVideo) modalVideo.src = '';
 }
+
+// Optional: Show an error message if iframe fails to load (works only for some cases, not X-Frame-Options)
+document.getElementById('modal-video')?.addEventListener('error', function () {
+  const errMsg = document.getElementById('video-error-message');
+  if (errMsg) errMsg.style.display = 'block';
+});
 
 // Close modal on Escape key
 document.addEventListener('keydown', function (e) {

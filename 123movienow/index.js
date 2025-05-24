@@ -76,6 +76,7 @@ function startBannerSlideshow() {
 async function loadHomePageContent() {
   // Fetch data using global fetchMedia
   const dailyTrendingMovies = await window.fetchMedia('trending/movie/day');
+console.log('Trending Movies:', dailyTrendingMovies);
   const dailyTrendingTvShows = await window.fetchMedia('trending/tv/day');
   const weeklyTrendMovie = await window.fetchMedia('trending/movie/week');
 

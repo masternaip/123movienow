@@ -12,6 +12,7 @@ header {
   align-items: center;
   background: #141414;
   padding: 16px 40px;
+  position: relative;
 }
 
 .logo {
@@ -19,6 +20,31 @@ header {
   font-weight: bold;
   color: #e50914;
   letter-spacing: 2px;
+}
+
+.main-nav {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 32px;
+}
+
+.nav-link {
+  color: #fff;
+  font-size: 1.15rem;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 6px 18px;
+  border-radius: 4px;
+  letter-spacing: 1px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.nav-link.active,
+.nav-link:hover {
+  background: #e50914;
+  color: #fff;
 }
 
 .search-btn {

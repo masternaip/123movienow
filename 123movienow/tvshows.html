@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>TV Shows</title>
+  <title>New & Popular Movies</title>
   <link rel="stylesheet" href="style.css">
   <style>
     .header {
@@ -205,28 +205,24 @@
 
   <main>
     <section class="movie-list-section">
-      <h2>Trending TV Shows</h2>
-      <div class="movie-list" id="trending-tvshows-list"></div>
+      <h2>Popular Movies</h2>
+      <div class="movie-list" id="popular-movies-list"></div>
     </section>
     <section class="movie-list-section">
-      <h2>Box Office (Popular TV)</h2>
-      <div class="movie-list" id="popular-tvshows-list"></div>
+      <h2>Upcoming Movies</h2>
+      <div class="movie-list" id="upcoming-movies-list"></div>
     </section>
     <section class="movie-list-section">
-      <h2>Drama</h2>
-      <div class="movie-list" id="drama-tvshows-list"></div>
+      <h2>New Movies (Now Playing)</h2>
+      <div class="movie-list" id="nowplaying-movies-list"></div>
     </section>
     <section class="movie-list-section">
-      <h2>Action</h2>
-      <div class="movie-list" id="action-tvshows-list"></div>
-    </section>
-    <section class="movie-list-section">
-      <h2>Romance</h2>
-      <div class="movie-list" id="romance-tvshows-list"></div>
+      <h2>2025 Movies</h2>
+      <div class="movie-list" id="movies-2025-list"></div>
     </section>
   </main>
 
-  <!-- Modal for show details -->
+  <!-- Modal for movie details -->
   <div id="modal" class="modal">
     <div class="modal-content">
       <span class="close-button" onclick="closeModal()">&times;</span>
@@ -256,34 +252,40 @@
 
   <script src="script.js"></script>
   <script>
-    // Genre IDs for TV on TMDb: Drama=18, Action=10759, Romance=10749
-    async function fetchTrendingTVShows() {
-      const res = await fetch(`${BASE_URL}/trending/tv/week?api_key=${API_KEY}`);
-      return (await res.json()).results;
+    // These helpers assume BASE_URL and API_KEY are defined in script.js
+    async function fetchPopularMovies() {
+      const res = await fetch(`${BASE_URL}/movie/popular?api_key=${API_KEY}`);
+      const data = await res.json();
+      return data.results;
     }
-    async function fetchPopularTVShows() {
-      const res = await fetch(`${BASE_URL}/tv/popular?api_key=${API_KEY}`);
-      return (await res.json()).results;
+    async function fetchUpcomingMovies() {
+      const res = await fetch(`${BASE_URL}/movie/upcoming?api_key=${API_KEY}`);
+      const data = await res.json();
+      return data.results;
     }
-    async function fetchTVByGenre(genreId) {
-      const res = await fetch(`${BASE_URL}/discover/tv?api_key=${API_KEY}&with_genres=${genreId}&sort_by=popularity.desc`);
-      return (await res.json()).results;
+    async function fetchNowPlayingMovies() {
+      const res = await fetch(`${BASE_URL}/movie/now_playing?api_key=${API_KEY}`);
+      const data = await res.json();
+      return data.results;
     }
-    async function initTVShowsPage() {
-      const [trending, popular, drama, action, romance] = await Promise.all([
-        fetchTrendingTVShows(),
-        fetchPopularTVShows(),
-        fetchTVByGenre(18),      // Drama
-        fetchTVByGenre(10759),   // Action & Adventure
-        fetchTVByGenre(10749)    // Romance
+    async function fetch2025Movies() {
+      const res = await fetch(`${BASE_URL}/discover/movie?api_key=${API_KEY}&primary_release_year=2025&sort_by=popularity.desc`);
+      const data = await res.json();
+      return data.results;
+    }
+    async function initNewMoviesPage() {
+      const [popular, upcoming, nowplaying, movies2025] = await Promise.all([
+        fetchPopularMovies(),
+        fetchUpcomingMovies(),
+        fetchNowPlayingMovies(),
+        fetch2025Movies()
       ]);
-      displayList(trending, 'trending-tvshows-list');
-      displayList(popular, 'popular-tvshows-list');
-      displayList(drama, 'drama-tvshows-list');
-      displayList(action, 'action-tvshows-list');
-      displayList(romance, 'romance-tvshows-list');
+      displayList(popular, 'popular-movies-list');
+      displayList(upcoming, 'upcoming-movies-list');
+      displayList(nowplaying, 'nowplaying-movies-list');
+      displayList(movies2025, 'movies-2025-list');
     }
-    document.addEventListener('DOMContentLoaded', initTVShowsPage);
+    document.addEventListener('DOMContentLoaded', initNewMoviesPage);
   </script>
 </body>
 </html>

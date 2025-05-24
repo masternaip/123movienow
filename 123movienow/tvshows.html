@@ -2,50 +2,44 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Trending TV Shows | 123MovieNow</title>
+  <title>123MovieNow - TV Shows</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="header">
-    <div class="header-content">
-      <div class="logo">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Netflix_2015_logo.svg/1920px-Netflix_2015_logo.svg.png" alt="Netflix Logo">
-      </div>
-      <nav class="nav-links">
-        <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a href="tvshows.html">TV Shows</a></li>
-          <li><a href="movies.html">Movies</a></li>
-          <li><a href="new-movies.html">New & Popular</a></li>
-        </ul>
-      </nav>
+    <div class="logo">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Netflix_2015_logo.svg/1920px-Netflix_2015_logo.svg.png" alt="Netflix Logo">
+    </div>
+    <nav class="nav-links">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="tvshows.html" class="active">TV Shows</a></li>
+        <li><a href="movies.html">Movies</a></li>
+        <li><a href="new-movies.html">New & Popular</a></li>
+      </ul>
+    </nav>
+    <div class="header-right">
+      <span class="search-icon">🔍</span>
     </div>
   </header>
 
   <main>
     <section class="movie-list-section">
-      <h2 class="section-title">Trending TV Shows</h2>
-      <div class="tvshows-list" id="tvshows-trending"></div>
+      <h2>TV Shows Trend</h2>
+      <div class="movie-list" id="tvshows-list"></div>
     </section>
     <section class="movie-list-section">
-      <h2 class="section-title">Action</h2>
-      <div class="tvshows-list" id="tvshows-action"></div>
+      <h2>Netflix Originals</h2>
+      <div class="movie-list" id="netflix-tvshows-list"></div>
     </section>
     <section class="movie-list-section">
-      <h2 class="section-title">Horror</h2>
-      <div class="tvshows-list" id="tvshows-horror"></div>
+      <h2>HBO</h2>
+      <div class="movie-list" id="hbo-tvshows-list"></div>
     </section>
-    <section class="movie-list-section">
-      <h2 class="section-title">Adventure</h2>
-      <div class="tvshows-list" id="tvshows-adventure"></div>
-    </section>
-    <section class="movie-list-section">
-      <h2 class="section-title">Drama</h2>
-      <div class="tvshows-list" id="tvshows-drama"></div>
-    </section>
+    <!-- Add more sections as needed -->
   </main>
 
-  <!-- Modal for TV show details -->
+  <!-- Modal (optional, same as new-movies.html) -->
   <div id="modal" class="modal">
     <div class="modal-content">
       <span class="close-button" onclick="closeModal()">&times;</span>
@@ -74,5 +68,17 @@
   </div>
 
   <script src="script.js"></script>
+  <script>
+    async function initTvShowsPage() {
+      const tvshows = await fetchTrending('tv');
+      const hboTvShows = await fetchTvShowsByNetworkOrCompany(49); // HBO network ID
+      const netflixTvShows = await fetchTvShowsByNetworkOrCompany(213); // Netflix network ID
+
+      displayList(tvshows, 'tvshows-list');
+      displayList(hboTvShows, 'hbo-tvshows-list');
+      displayList(netflixTvShows, 'netflix-tvshows-list');
+    }
+    document.addEventListener('DOMContentLoaded', initTvShowsPage);
+  </script>
 </body>
 </html>

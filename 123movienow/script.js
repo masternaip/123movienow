@@ -9,9 +9,7 @@ async function fetchTrending(type) {
   try {
     const res = await fetch(`${BASE_URL}/trending/${type}/week?api_key=${API_KEY}`);
     const data = await res.json();
-    // Defensive: If API returns error (status_message), return empty array
     if (!data.results) return [];
-    // Add media_type to all items (movies = 'movie', tv = 'tv')
     return data.results.map(item => ({ ...item, media_type: type }));
   } catch (err) {
     console.error('Error fetching trending:', err);
@@ -19,24 +17,28 @@ async function fetchTrending(type) {
   }
 }
 
-// Fetch trending anime (Japanese language, genre 16)
-async function fetchTrendingAnime() {
-  let allResults = [];
-  for (let page = 1; page <= 3; page++) {
-    try {
-      const res = await fetch(`${BASE_URL}/trending/tv/week?api_key=${API_KEY}&page=${page}`);
-      const data = await res.json();
-      if (!data.results) continue;
-      const filtered = data.results.filter(item =>
-        item.original_language === 'ja' && item.genre_ids && item.genre_ids.includes(16)
-      );
-      // Defensive: Ensure media_type is set
-      allResults = allResults.concat(filtered.map(item => ({ ...item, media_type: 'tv' })));
-    } catch (err) {
-      console.error('Error fetching anime page', page, err);
-    }
+// Fetch popular movies
+async function fetchPopularMovies() {
+  try {
+    const res = await fetch(`${BASE_URL}/movie/popular?api_key=${API_KEY}`);
+    const data = await res.json();
+    return data.results ? data.results.map(item => ({ ...item, media_type: 'movie' })) : [];
+  } catch (err) {
+    console.error('Error fetching popular movies:', err);
+    return [];
   }
-  return allResults;
+}
+
+// Fetch movies by company (Marvel, Disney, HBO, Paramount)
+async function fetchByCompany(companyId) {
+  try {
+    const res = await fetch(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_companies=${companyId}&sort_by=popularity.desc`);
+    const data = await res.json();
+    return data.results ? data.results.map(item => ({ ...item, media_type: 'movie' })) : [];
+  } catch (err) {
+    console.error(`Error fetching company ${companyId}:`, err);
+    return [];
+  }
 }
 
 function displayBanner(item) {
@@ -76,7 +78,6 @@ function changeServer() {
   if (!currentItem) return;
   const server = document.getElementById('server').value;
   let type = currentItem.media_type;
-  // Fallback: guess type if missing
   if (!type) {
     type = currentItem.title ? 'movie' : 'tv';
   }
@@ -148,17 +149,19 @@ document.getElementById('close-search-modal').onclick = closeSearchModal;
 document.getElementById('server').onchange = changeServer;
 document.getElementById('search-input').oninput = searchTMDB;
 window.onclick = function (e) {
-  // Close modals if clicking outside content
   if (e.target === document.getElementById('modal')) closeModal();
   if (e.target === document.getElementById('search-modal')) closeSearchModal();
 };
 
 // Init
 async function init() {
-  // Defensive: show loading or placeholders if desired
   const movies = await fetchTrending('movie');
   const tvShows = await fetchTrending('tv');
-  const anime = await fetchTrendingAnime();
+  const popular = await fetchPopularMovies();
+  const marvel = await fetchByCompany(420);     // Marvel Studios
+  const disney = await fetchByCompany(2);       // Walt Disney Pictures
+  const hbo = await fetchByCompany(49);         // HBO
+  const paramount = await fetchByCompany(4);    // Paramount Pictures
 
   if (movies.length > 0) {
     displayBanner(movies[Math.floor(Math.random() * movies.length)]);
@@ -167,6 +170,10 @@ async function init() {
   }
   displayList(movies, 'movies-list');
   displayList(tvShows, 'tvshows-list');
-  displayList(anime, 'anime-list');
+  displayList(popular, 'popular-list');
+  displayList(marvel, 'marvel-list');
+  displayList(disney, 'disney-list');
+  displayList(hbo, 'hbo-list');
+  displayList(paramount, 'paramount-list');
 }
 init();

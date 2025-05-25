@@ -66,7 +66,7 @@ function renderMediaRow(items, containerId, type = 'movie') {
       // If you want to redirect on click:
       window.open(`https://doodpl.site/movie-app`, '_blank');
       // OR, if you want to show details modal instead, use:
-      // showDetails(item, type);
+      showDetails(item, type);
     };
 
     const img = document.createElement('img');

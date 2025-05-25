@@ -1,221 +1,89 @@
-const API_KEY = 'a1e72fd93ed59f56e6332813b9f8dcae';
-const BASE_URL = 'https://api.themoviedb.org/3';
-const IMG_URL = 'https://image.tmdb.org/t/p/w500';
-const PLACEHOLDER = 'https://via.placeholder.com/200x300?text=No+Image';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MovieFlix</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Link to your CSS -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div class="logo">MovieFlix</div>
+    <div class="header-center">
+      <nav class="main-nav">
+        <a href="index.html" class="nav-link active">Home</a>
+        <a href="movie.html" class="nav-link">Movie</a>
+      </nav>
+    </div>
+    <button id="search-btn" class="search-btn">Search</button>
+  </header>
 
-let bannerItems = [];
-let currentBanner = 0;
-let currentItem = null;
-let currentType = 'movie';
+  <!-- Banner Section -->
+  <section id="banner" class="banner">
+    <button id="banner-left" class="banner-arrow banner-arrow-left">&#8592;</button>
+    <div class="banner-content">
+      <h1 id="banner-title">Loading...</h1>
+      <p id="banner-description" class="banner-description"></p>
+    </div>
+    <button id="banner-right" class="banner-arrow banner-arrow-right">&#8594;</button>
+  </section>
 
-// --- Data Fetchers ---
-async function fetchTrending(type = 'movie') {
-  const res = await fetch(`${BASE_URL}/trending/${type}/week?api_key=${API_KEY}`);
-  const data = await res.json();
-  return data.results || [];
-}
+  <main>
+    <h2>Trending Movies</h2>
+    <div id="movies-list" class="media-row"></div>
 
-async function fetchPopularMovies() {
-  const res = await fetch(`${BASE_URL}/movie/popular?api_key=${API_KEY}`);
-  const data = await res.json();
-  return data.results || [];
-}
+    <h2>Trending TV Shows</h2>
+    <div id="tvshows-list" class="media-row"></div>
 
-async function fetchByKeyword(keyword) {
-  const res = await fetch(`${BASE_URL}/search/keyword?api_key=${API_KEY}&query=${encodeURIComponent(keyword)}`);
-  const data = await res.json();
-  if (data.results && data.results.length > 0) {
-    const keywordId = data.results[0].id;
-    const res2 = await fetch(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_keywords=${keywordId}`);
-    const data2 = await res2.json();
-    return data2.results || [];
-  }
-  return [];
-}
+    <h2>Popular Movies</h2>
+    <div id="popular-list" class="media-row"></div>
 
-async function fetchMoviesByCompany(companyId) {
-  const res = await fetch(`${BASE_URL}/discover/movie?api_key=${API_KEY}&with_companies=${companyId}`);
-  const data = await res.json();
-  return data.results || [];
-}
+    <h2>Marvel Movies</h2>
+    <div id="marvel-list" class="media-row"></div>
 
-// --- Banner Logic ---
-function showBanner(index) {
-  if (!bannerItems.length) return;
-  currentBanner = (index + bannerItems.length) % bannerItems.length;
-  const item = bannerItems[currentBanner];
-  const banner = document.getElementById('banner');
-  banner.style.backgroundImage = `url('${item.backdrop_path ? IMG_URL + item.backdrop_path : PLACEHOLDER}')`;
-  document.getElementById('banner-title').textContent = item.title || item.name || 'No Title';
-  document.getElementById('banner-description').textContent = item.overview || 'No description available.';
-  banner.onclick = () => showDetails(item, item.media_type || 'movie');
-}
+    <h2>Disney Movies</h2>
+    <div id="disney-list" class="media-row"></div>
 
-function nextBanner(n) {
-  showBanner(currentBanner + n);
-}
+    <h2>HBO Movies</h2>
+    <div id="hbo-list" class="media-row"></div>
 
-// --- Render Media Rows (Cards with poster, title, date) ---
-function renderMediaRow(items, containerId, type = 'movie') {
-  const container = document.getElementById(containerId);
-  container.innerHTML = '';
-  items.forEach(item => {
-    const card = document.createElement('div');
-    card.className = 'movie-card';
-    card.onclick = () => showDetails(item, type);
+    <h2>Paramount Movies</h2>
+    <div id="paramount-list" class="media-row"></div>
+  </main>
 
-    const img = document.createElement('img');
-    img.src = item.poster_path ? IMG_URL + item.poster_path : PLACEHOLDER;
-    img.alt = item.title || item.name || 'No Title';
+  <!-- Modal for movie/TV details -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span id="close-modal" class="close">&times;</span>
+      <div class="modal-info">
+        <img id="modal-image" class="modal-poster" src="" alt="Poster">
+        <div>
+          <h2 id="modal-title"></h2>
+          <div id="modal-rating" class="stars"></div>
+          <p id="modal-description"></p>
+          <label for="server">Choose Server:</label>
+          <select id="server">
+            <option value="vidsrc.cc">vidsrc.cc</option>
+            <option value="vidsrc.me">vidsrc.me</option>
+            <option value="player.videasy.net">videasy</option>
+          </select>
+        </div>
+      </div>
+      <iframe id="modal-video" class="modal-video" src="" allowfullscreen></iframe>
+    </div>
+  </div>
 
-    const title = document.createElement('div');
-    title.className = 'movie-title';
-    title.textContent = item.title || item.name || 'No Title';
+  <!-- Search Modal -->
+  <div id="search-modal" class="modal">
+    <div class="search-modal-content">
+      <span id="close-search-modal" class="close">&times;</span>
+      <input type="text" id="search-input" placeholder="Search movies, TV shows...">
+      <div id="search-results" class="search-results"></div>
+    </div>
+  </div>
 
-    const date = document.createElement('div');
-    date.className = 'movie-date';
-    if (type === 'tv') {
-      date.textContent = item.first_air_date ? `First Air: ${item.first_air_date}` : '';
-    } else {
-      date.textContent = item.release_date ? `Release: ${item.release_date}` : '';
-    }
-
-    card.appendChild(img);
-    card.appendChild(title);
-    card.appendChild(date);
-
-    container.appendChild(card);
-  });
-}
-
-// --- Modal Logic ---
-function showDetails(item, type = 'movie') {
-  currentItem = item;
-  currentType = type;
-
-  document.getElementById('modal-title').textContent = item.title || item.name || '';
-  document.getElementById('modal-description').textContent = item.overview || 'No description available.';
-  document.getElementById('modal-image').src = item.poster_path ? IMG_URL + item.poster_path : PLACEHOLDER;
-
-  // Stars rating (0-10 TMDB to 0-5 stars)
-  let rating = item.vote_average ? Math.round(item.vote_average) / 2 : 0;
-  let stars = '★'.repeat(Math.round(rating)) + '☆'.repeat(5 - Math.round(rating));
-  document.getElementById('modal-rating').textContent = stars + (item.vote_average ? ` (${item.vote_average.toFixed(1)})` : '');
-
-  changeServer();
-  document.getElementById('modal').style.display = 'flex';
-}
-
-function changeServer() {
-  if (!currentItem) return;
-  const server = document.getElementById('server').value;
-  let embedURL = '';
-  if (server === 'vidsrc.cc') {
-    embedURL = `https://vidsrc.cc/v2/embed/${currentType}/${currentItem.id}`;
-  } else if (server === 'vidsrc.me') {
-    embedURL = `https://vidsrc.me/embed/${currentType}?tmdb=${currentItem.id}`;
-  } else if (server === 'player.videasy.net') {
-    embedURL = `https://player.videasy.net/${currentType}/${currentItem.id}`;
-  }
-  document.getElementById('modal-video').src = embedURL;
-}
-
-function closeModal() {
-  document.getElementById('modal').style.display = 'none';
-  document.getElementById('modal-video').src = '';
-}
-
-// --- Search Modal Logic ---
-function openSearchModal() {
-  document.getElementById('search-modal').style.display = 'flex';
-  document.getElementById('search-input').focus();
-}
-
-function closeSearchModal() {
-  document.getElementById('search-modal').style.display = 'none';
-  document.getElementById('search-results').innerHTML = '';
-  document.getElementById('search-input').value = '';
-}
-
-async function searchTMDB() {
-  const query = document.getElementById('search-input').value;
-  const container = document.getElementById('search-results');
-  if (!query.trim()) {
-    container.innerHTML = '';
-    return;
-  }
-  try {
-    const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
-    const data = await res.json();
-    container.innerHTML = '';
-    if (!data.results || !data.results.length) {
-      container.innerHTML = '<div>No results found.</div>';
-      return;
-    }
-    data.results.forEach(item => {
-      if (!item.poster_path) return;
-      const img = document.createElement('img');
-      img.src = IMG_URL + item.poster_path;
-      img.alt = item.title || item.name || '';
-      img.onclick = () => {
-        closeSearchModal();
-        showDetails(item, item.media_type || 'movie');
-      };
-      container.appendChild(img);
-    });
-  } catch (err) {
-    container.innerHTML = '<div style="color:red">Failed to search movies.</div>';
-  }
-}
-
-// --- Event Listeners ---
-document.getElementById('search-btn').onclick = openSearchModal;
-document.getElementById('close-modal').onclick = closeModal;
-document.getElementById('close-search-modal').onclick = closeSearchModal;
-document.getElementById('server').onchange = changeServer;
-document.getElementById('search-input').oninput = searchTMDB;
-window.onclick = function (e) {
-  if (e.target === document.getElementById('modal')) closeModal();
-  if (e.target === document.getElementById('search-modal')) closeSearchModal();
-};
-document.getElementById('banner-left').onclick = e => {
-  e.stopPropagation();
-  nextBanner(-1);
-};
-document.getElementById('banner-right').onclick = e => {
-  e.stopPropagation();
-  nextBanner(1);
-};
-
-// --- INIT ---
-async function init() {
-  // Trending
-  const trendingMovies = await fetchTrending('movie');
-  const trendingTV = await fetchTrending('tv');
-  renderMediaRow(trendingMovies, 'movies-list', 'movie');
-  renderMediaRow(trendingTV, 'tvshows-list', 'tv');
-
-  // Banner: use trending movies + tv
-  bannerItems = [...trendingMovies.slice(0, 5), ...trendingTV.slice(0, 5)];
-  showBanner(0);
-
-  // Popular
-  const popular = await fetchPopularMovies();
-  renderMediaRow(popular, 'popular-list', 'movie');
-
-  // Marvel (keyword)
-  const marvel = await fetchByKeyword('Marvel');
-  renderMediaRow(marvel, 'marvel-list', 'movie');
-
-  // Disney (company 2), HBO (2594), Paramount (4)
-  const disney = await fetchMoviesByCompany(2);
-  renderMediaRow(disney, 'disney-list', 'movie');
-
-  const hbo = await fetchMoviesByCompany(2594);
-  renderMediaRow(hbo, 'hbo-list', 'movie');
-
-  const paramount = await fetchMoviesByCompany(4);
-  renderMediaRow(paramount, 'paramount-list', 'movie');
-}
-
-document.addEventListener('DOMContentLoaded', init);
+  <!-- Link your main JS -->
+  <script src="script.js"></script>
+</body>
+</html>

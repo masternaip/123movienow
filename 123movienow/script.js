@@ -63,7 +63,7 @@ function renderMediaRow(items, containerId, type = 'movie') {
     const card = document.createElement('div');
     card.className = 'movie-card';
    card.onclick = () => {
-  window.open(`https://doodpl.site/movie-app${type}/${item.id}`, '_blank');
+  window.open(`https://doodpl.site/movie-app`, '_blank');
 };
 
     const img = document.createElement('img');

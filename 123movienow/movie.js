@@ -25,6 +25,7 @@ function displayList(items, containerId) {
     card.className = 'movie-card';
     card.onclick = () => {
   window.open(`https://doodpl.site/movie-app`, '_blank');
+      showDetails(item);
 };
 
    

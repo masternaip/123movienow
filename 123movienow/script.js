@@ -1,8 +1,12 @@
-// --- CONFIG ---
-const API_KEY = 'a1e72fd93ed59f56e6332813b9f8dcae'; // Replace with your TMDB API Key
+const API_KEY = 'a1e72fd93ed59f56e6332813b9f8dcae';
 const BASE_URL = 'https://api.themoviedb.org/3';
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 const PLACEHOLDER = 'https://via.placeholder.com/200x300?text=No+Image';
+
+let bannerItems = [];
+let currentBanner = 0;
+let currentItem = null;
+let currentType = 'movie';
 
 // --- Data Fetchers ---
 async function fetchTrending(type = 'movie') {
@@ -35,15 +39,7 @@ async function fetchMoviesByCompany(companyId) {
   return data.results || [];
 }
 
-async function fetchMovieDetails(id, type = 'movie') {
-  const res = await fetch(`${BASE_URL}/${type}/${id}?api_key=${API_KEY}`);
-  return await res.json();
-}
-
 // --- Banner Logic ---
-let bannerItems = [];
-let currentBanner = 0;
-
 function showBanner(index) {
   if (!bannerItems.length) return;
   currentBanner = (index + bannerItems.length) % bannerItems.length;
@@ -52,7 +48,6 @@ function showBanner(index) {
   banner.style.backgroundImage = `url('${item.backdrop_path ? IMG_URL + item.backdrop_path : PLACEHOLDER}')`;
   document.getElementById('banner-title').textContent = item.title || item.name || 'No Title';
   document.getElementById('banner-description').textContent = item.overview || 'No description available.';
-  // Click banner to open modal
   banner.onclick = () => showDetails(item, item.media_type || 'movie');
 }
 
@@ -60,24 +55,40 @@ function nextBanner(n) {
   showBanner(currentBanner + n);
 }
 
-// --- Render Media Rows ---
+// --- Render Media Rows (Cards with poster, title, date) ---
 function renderMediaRow(items, containerId, type = 'movie') {
   const container = document.getElementById(containerId);
   container.innerHTML = '';
   items.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'movie-card';
+    card.onclick = () => showDetails(item, type);
+
     const img = document.createElement('img');
     img.src = item.poster_path ? IMG_URL + item.poster_path : PLACEHOLDER;
-    img.alt = item.title || item.name || '';
-    img.title = item.title || item.name || '';
-    img.onclick = () => showDetails(item, type);
-    container.appendChild(img);
+    img.alt = item.title || item.name || 'No Title';
+
+    const title = document.createElement('div');
+    title.className = 'movie-title';
+    title.textContent = item.title || item.name || 'No Title';
+
+    const date = document.createElement('div');
+    date.className = 'movie-date';
+    if (type === 'tv') {
+      date.textContent = item.first_air_date ? `First Air: ${item.first_air_date}` : '';
+    } else {
+      date.textContent = item.release_date ? `Release: ${item.release_date}` : '';
+    }
+
+    card.appendChild(img);
+    card.appendChild(title);
+    card.appendChild(date);
+
+    container.appendChild(card);
   });
 }
 
 // --- Modal Logic ---
-let currentItem = null;
-let currentType = 'movie';
-
 function showDetails(item, type = 'movie') {
   currentItem = item;
   currentType = type;
@@ -91,13 +102,10 @@ function showDetails(item, type = 'movie') {
   let stars = '★'.repeat(Math.round(rating)) + '☆'.repeat(5 - Math.round(rating));
   document.getElementById('modal-rating').textContent = stars + (item.vote_average ? ` (${item.vote_average.toFixed(1)})` : '');
 
-  // Set video
   changeServer();
-
   document.getElementById('modal').style.display = 'flex';
 }
 
-// Streaming server selector
 function changeServer() {
   if (!currentItem) return;
   const server = document.getElementById('server').value;
@@ -129,7 +137,6 @@ function closeSearchModal() {
   document.getElementById('search-input').value = '';
 }
 
-// Search TMDB
 async function searchTMDB() {
   const query = document.getElementById('search-input').value;
   const container = document.getElementById('search-results');

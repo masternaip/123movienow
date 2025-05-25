@@ -62,17 +62,12 @@ function renderMediaRow(items, containerId, type = 'movie') {
   items.forEach(item => {
     const card = document.createElement('div');
     card.className = 'movie-card';
-   card.onclick = () => {
-     
-  window.open(`https://doodpl.site/movie-app`, '_blank');
-};
-showDetails(item, type); // This is where you set the click handler
-
-    // ... (other code for creating and appending img, title, date, etc.)
-
-};
-
-    
+    card.onclick = () => {
+      // If you want to redirect on click:
+      window.open(`https://doodpl.site/movie-app`, '_blank');
+      // OR, if you want to show details modal instead, use:
+      // showDetails(item, type);
+    };
 
     const img = document.createElement('img');
     img.src = item.poster_path ? IMG_URL + item.poster_path : PLACEHOLDER;

@@ -64,6 +64,11 @@ function renderMediaRow(items, containerId, type = 'movie') {
     card.className = 'movie-card';
    card.onclick = () => {
   window.open(`https://doodpl.site/movie-app`, '_blank');
+card.onclick = () => showDetails(item, type); // This is where you set the click handler
+
+    // ... (other code for creating and appending img, title, date, etc.)
+
+    container.appendChild(card);
 };
 
     const img = document.createElement('img');

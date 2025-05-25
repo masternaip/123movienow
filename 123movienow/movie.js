@@ -4,14 +4,14 @@ const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 const PLACEHOLDER = 'https://via.placeholder.com/200x300?text=No+Image';
 let currentItem;
 
-// Fetch popular movies
-async function fetchPopularMovies(page = 1) {
+// Fetch movie data
+async function fetchMovies(endpoint) {
   try {
-    const res = await fetch(`${BASE_URL}/movie/popular?api_key=${API_KEY}&page=${page}`);
+    const res = await fetch(`${BASE_URL}${endpoint}?api_key=${API_KEY}`);
     const data = await res.json();
     return data.results || [];
   } catch (err) {
-    console.error('Error fetching movies:', err);
+    console.error('Fetch error:', err);
     return [];
   }
 }
@@ -79,7 +79,7 @@ async function searchTMDB() {
     return;
   }
   try {
-    const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
+    const res = await fetch(`${BASE_URL}/search/movie?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
     const data = await res.json();
     container.innerHTML = '';
     if (!data.results) {
@@ -92,7 +92,7 @@ async function searchTMDB() {
       if (!item.poster_path) return;
       const img = document.createElement('img');
       img.src = item.poster_path ? `${IMG_URL}${item.poster_path}` : PLACEHOLDER;
-      img.alt = item.title || item.name || 'No Title';
+      img.alt = item.title || 'No Title';
       img.onclick = () => {
         closeSearchModal();
         showDetails(item);
@@ -118,7 +118,16 @@ window.onclick = function (e) {
 
 // Init function for movie.html
 async function init() {
-  const movies = await fetchPopularMovies();
-  displayList(movies, 'all-movies-list');
+  // Trending Movies
+  const trending = await fetchMovies('/trending/movie/week');
+  displayList(trending, 'trending-movies-list');
+
+  // Upcoming Movies
+  const upcoming = await fetchMovies('/movie/upcoming');
+  displayList(upcoming, 'upcoming-movies-list');
+
+  // Box Office (Now Playing)
+  const boxoffice = await fetchMovies('/movie/now_playing');
+  displayList(boxoffice, 'boxoffice-movies-list');
 }
 document.addEventListener('DOMContentLoaded', init);

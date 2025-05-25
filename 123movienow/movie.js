@@ -2,7 +2,7 @@ const API_KEY = 'a1e72fd93ed59f56e6332813b9f8dcae';
 const BASE_URL = 'https://api.themoviedb.org/3';
 const IMG_URL = 'https://image.tmdb.org/t/p/w500';
 const PLACEHOLDER = 'https://via.placeholder.com/200x300?text=No+Image';
-let currentItem;
+let currentItem = null;
 
 // Fetch movie data
 async function fetchMovies(endpoint) {
@@ -45,7 +45,7 @@ function displayList(items, containerId) {
   });
 }
 
-// Modal logic (unchanged)
+// Modal logic
 function showDetails(item) {
   currentItem = item;
   document.getElementById('modal-title').textContent = item.title || '';
@@ -75,7 +75,7 @@ function closeModal() {
   document.getElementById('modal-video').src = '';
 }
 
-// Search logic for modal (unchanged)
+// Search logic for modal
 function openSearchModal() {
   document.getElementById('search-modal').style.display = 'flex';
   document.getElementById('search-input').focus();
@@ -121,7 +121,7 @@ async function searchTMDB() {
   }
 }
 
-// Event Listeners (unchanged)
+// Event Listeners
 document.getElementById('search-btn').onclick = openSearchModal;
 document.getElementById('close-modal').onclick = closeModal;
 document.getElementById('close-search-modal').onclick = closeSearchModal;
@@ -132,14 +132,17 @@ window.onclick = function (e) {
   if (e.target === document.getElementById('search-modal')) closeSearchModal();
 };
 
-// Init function for movie.html (unchanged)
+// Init function for movie.html
 async function init() {
+  // Trending Movies
   const trending = await fetchMovies('/trending/movie/week');
   displayList(trending, 'trending-movies-list');
 
+  // Upcoming Movies
   const upcoming = await fetchMovies('/movie/upcoming');
   displayList(upcoming, 'upcoming-movies-list');
 
+  // Box Office (Now Playing)
   const boxoffice = await fetchMovies('/movie/now_playing');
   displayList(boxoffice, 'boxoffice-movies-list');
 }

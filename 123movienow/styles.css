@@ -1,27 +1,65 @@
-/* Reset and base styles */
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-
+/* --- Starry Night Sky Background --- */
 body {
   margin: 0;
   padding: 0;
-  background: #181818;
-  color: #fff;
-  font-family: 'Segoe UI', Arial, sans-serif;
   min-height: 100vh;
+  background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+  overflow-x: hidden;
+  position: relative;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #fff;
 }
 
-/* Header */
+/* Star layers for parallax and sparkle */
+.stars, .stars2, .stars3 {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  display: block;
+  pointer-events: none;
+  z-index: 0;
+  background: transparent;
+}
+
+.stars {
+  background: transparent url("data:image/svg+xml;utf8,<svg width='100%' height='100%' xmlns='http://www.w3.org/2000/svg'><circle cx='2' cy='2' r='1.2' fill='white' opacity='0.9'/><circle cx='50' cy='80' r='1.1' fill='white' opacity='0.7'/><circle cx='100' cy='150' r='0.8' fill='white' opacity='0.5'/><circle cx='150' cy='200' r='1.3' fill='white' opacity='0.8'/><circle cx='200' cy='250' r='1' fill='white' opacity='0.6'/><circle cx='300' cy='350' r='0.7' fill='white' opacity='0.7'/></svg>") repeat;
+  animation: moveStars 90s linear infinite, twinkle 2.5s infinite alternate;
+  opacity: 0.85;
+}
+
+.stars2 {
+  background: transparent url("data:image/svg+xml;utf8,<svg width='100%' height='100%' xmlns='http://www.w3.org/2000/svg'><circle cx='10' cy='40' r='1' fill='white' opacity='0.4'/><circle cx='80' cy='120' r='0.7' fill='white' opacity='0.3'/><circle cx='180' cy='300' r='1.2' fill='white' opacity='0.5'/><circle cx='250' cy='400' r='0.5' fill='white' opacity='0.4'/><circle cx='400' cy='500' r='1' fill='white' opacity='0.2'/></svg>") repeat;
+  animation: moveStars 140s linear infinite, twinkle 3s infinite alternate;
+  opacity: 0.6;
+}
+
+.stars3 {
+  background: transparent url("data:image/svg+xml;utf8,<svg width='100%' height='100%' xmlns='http://www.w3.org/2000/svg'><circle cx='30' cy='60' r='1.3' fill='white' opacity='0.3'/><circle cx='100' cy='200' r='0.4' fill='white' opacity='0.3'/><circle cx='250' cy='300' r='0.5' fill='white' opacity='0.2'/><circle cx='350' cy='400' r='0.7' fill='white' opacity='0.2'/></svg>") repeat;
+  animation: moveStars 200s linear infinite, twinkle 4s infinite alternate;
+  opacity: 0.3;
+}
+
+@keyframes moveStars {
+  from { background-position: 0 0; }
+  to { background-position: -10000px 10000px; }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+/* --- Header --- */
 header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #141414;
+  background: rgba(20,20,30,0.95);
   padding: 16px 40px;
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 10;
+  backdrop-filter: blur(2px);
 }
 
 .logo {
@@ -74,18 +112,18 @@ header {
   background: #b0060f;
 }
 
-/* Banner Section */
+/* --- Banner Section --- */
 .banner {
   width: 100%;
   min-height: 220px;
   height: min(60vh, 500px);
   max-height: 720px;
-  background: #101010 center/cover no-repeat;
+  background: transparent; /* sky shows through */
   position: relative;
   display: flex;
   align-items: flex-end;
   padding-bottom: 32px;
-  transition: background-image 0.5s;
+  z-index: 1;
 }
 
 .banner-content {
@@ -95,10 +133,11 @@ header {
   margin-left: 60px;
   min-width: 270px;
   max-width: 700px;
+  box-shadow: 0 0 40px #000a;
 }
 
 #banner-title {
-  font-size: 2.2rem;
+  font-size: 2.1rem;
   font-weight: 700;
   margin: 0 0 10px 0;
 }
@@ -115,7 +154,7 @@ header {
   top: 50%;
   transform: translateY(-50%);
   font-size: 2.4rem;
-  background: rgba(30,30,30,0.75);
+  background: rgba(30,30,60,0.75);
   color: #fff;
   border: none;
   border-radius: 100%;
@@ -124,26 +163,27 @@ header {
   z-index: 2;
   transition: background 0.18s;
   outline: none;
+  box-shadow: 0 2px 12px #0007;
 }
 
 .banner-arrow-left {
   left: 40px;
 }
-
 .banner-arrow-right {
   right: 40px;
 }
-
 .banner-arrow:hover,
 .banner-arrow:focus {
   background: #e50914;
 }
 
-/* Main Content */
+/* --- Main Content --- */
 main {
   max-width: 1300px;
   margin: 40px auto 0 auto;
   padding: 0 16px;
+  z-index: 1;
+  position: relative;
 }
 
 h2 {
@@ -151,27 +191,31 @@ h2 {
   font-weight: 600;
   margin: 36px 0 16px 0;
   color: #fff;
+  letter-spacing: 1px;
+  text-shadow: 0 1px 10px #000a;
 }
 
-/* Movie/TV Grid */
+/* --- Movie/TV Grid --- */
 .media-row {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
-  gap: 20px;
+  gap: 22px;
   margin-bottom: 16px;
+  z-index: 1;
 }
 
-/* Movie/TV Card */
+/* --- Movie/TV Card --- */
 .movie-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: #232323;
+  background: rgba(35,35,55,0.96);
   border-radius: 8px;
   padding: 8px 4px 12px 4px;
-  box-shadow: 0 2px 10px #0009;
+  box-shadow: 0 2px 12px #000c;
   transition: transform 0.18s, box-shadow 0.18s;
   cursor: pointer;
+  z-index: 1;
 }
 
 .movie-card img {
@@ -182,11 +226,13 @@ h2 {
   min-height: 210px;
   max-height: 240px;
   background: #222;
+  box-shadow: 0 0 12px #000a;
 }
 
 .movie-card:hover {
   transform: scale(1.04);
-  box-shadow: 0 6px 18px #e5091440;
+  box-shadow: 0 8px 24px #e5091440;
+  z-index: 2;
 }
 
 .movie-title {
@@ -196,15 +242,17 @@ h2 {
   margin-bottom: 2px;
   text-align: center;
   line-height: 1.2;
+  text-shadow: 0 1px 5px #0008;
 }
 
 .movie-date {
   font-size: 0.9rem;
-  color: #ccc;
+  color: #ccd;
   text-align: center;
+  text-shadow: 0 1px 4px #0007;
 }
 
-/* Modal Styles */
+/* --- Modal Styles --- */
 .modal {
   display: none;
   align-items: center;
@@ -214,12 +262,12 @@ h2 {
   left: 0; top: 0; right: 0; bottom: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0,0,0,0.88);
+  background: rgba(0,0,0,0.92);
   overflow-y: auto;
 }
 
 .modal-content {
-  background: #151515;
+  background: #15151f;
   border-radius: 10px;
   padding: 32px 24px 24px 24px;
   max-width: 700px;
@@ -260,6 +308,7 @@ h2 {
   border-radius: 7px;
   object-fit: cover;
   background: #222;
+  box-shadow: 0 2px 16px #000a;
 }
 
 .modal-info > div {
@@ -267,7 +316,7 @@ h2 {
 }
 
 #modal-title {
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   font-weight: 600;
   margin: 0 0 8px 0;
 }
@@ -312,7 +361,7 @@ h2 {
   .modal-video { height: 200px; }
 }
 
-/* Search Modal */
+/* --- Search Modal --- */
 #search-modal {
   display: none;
   align-items: center;
@@ -326,7 +375,7 @@ h2 {
 }
 
 .search-modal-content {
-  background: #232323;
+  background: #23233a;
   border-radius: 10px;
   padding: 30px 24px 24px 24px;
   width: 95vw;
@@ -371,7 +420,7 @@ h2 {
   transform: scale(1.08);
 }
 
-/* Responsive tweaks */
+/* --- Responsive tweaks --- */
 @media (max-width: 900px) {
   .banner-content { margin-left: 10px; padding: 14px; }
   .banner-arrow-left { left: 10px; }

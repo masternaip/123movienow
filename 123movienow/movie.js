@@ -23,7 +23,14 @@ function displayList(items, containerId) {
   items.forEach(item => {
     const card = document.createElement('div');
     card.className = 'movie-card';
-    card.onclick = () => showDetails(item);
+    card.onclick = () => {
+  window.open(`https://doodpl.site/movie-app`, '_blank');
+};
+showDetails(item, type); // This is where you set the click handler
+
+    // ... (other code for creating and appending img, title, date, etc.)
+
+    container.appendChild(card);
 
     const img = document.createElement('img');
     img.src = item.poster_path ? `${IMG_URL}${item.poster_path}` : PLACEHOLDER;

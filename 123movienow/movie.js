@@ -16,20 +16,36 @@ async function fetchMovies(endpoint) {
   }
 }
 
-// Render movie posters
+// Render movie cards (poster + title + release date)
 function displayList(items, containerId) {
   const container = document.getElementById(containerId);
   container.innerHTML = '';
   items.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'movie-card';
+    card.onclick = () => showDetails(item);
+
     const img = document.createElement('img');
     img.src = item.poster_path ? `${IMG_URL}${item.poster_path}` : PLACEHOLDER;
     img.alt = item.title || 'No Title';
-    img.onclick = () => showDetails(item);
-    container.appendChild(img);
+
+    const title = document.createElement('div');
+    title.className = 'movie-title';
+    title.textContent = item.title || 'No Title';
+
+    const date = document.createElement('div');
+    date.className = 'movie-date';
+    date.textContent = item.release_date ? `Release: ${item.release_date}` : '';
+
+    card.appendChild(img);
+    card.appendChild(title);
+    card.appendChild(date);
+
+    container.appendChild(card);
   });
 }
 
-// Modal logic
+// Modal logic (unchanged)
 function showDetails(item) {
   currentItem = item;
   document.getElementById('modal-title').textContent = item.title || '';
@@ -59,7 +75,7 @@ function closeModal() {
   document.getElementById('modal-video').src = '';
 }
 
-// Search logic for modal
+// Search logic for modal (unchanged)
 function openSearchModal() {
   document.getElementById('search-modal').style.display = 'flex';
   document.getElementById('search-input').focus();
@@ -105,7 +121,7 @@ async function searchTMDB() {
   }
 }
 
-// Event Listeners
+// Event Listeners (unchanged)
 document.getElementById('search-btn').onclick = openSearchModal;
 document.getElementById('close-modal').onclick = closeModal;
 document.getElementById('close-search-modal').onclick = closeSearchModal;
@@ -116,17 +132,14 @@ window.onclick = function (e) {
   if (e.target === document.getElementById('search-modal')) closeSearchModal();
 };
 
-// Init function for movie.html
+// Init function for movie.html (unchanged)
 async function init() {
-  // Trending Movies
   const trending = await fetchMovies('/trending/movie/week');
   displayList(trending, 'trending-movies-list');
 
-  // Upcoming Movies
   const upcoming = await fetchMovies('/movie/upcoming');
   displayList(upcoming, 'upcoming-movies-list');
 
-  // Box Office (Now Playing)
   const boxoffice = await fetchMovies('/movie/now_playing');
   displayList(boxoffice, 'boxoffice-movies-list');
 }

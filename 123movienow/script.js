@@ -62,7 +62,9 @@ function renderMediaRow(items, containerId, type = 'movie') {
   items.forEach(item => {
     const card = document.createElement('div');
     card.className = 'movie-card';
-    card.onclick = () => showDetails(item, type);
+   card.onclick = () => {
+  window.open(`https://doodpl.site/movie-app/${type}/${item.id}`, '_blank');
+};
 
     const img = document.createElement('img');
     img.src = item.poster_path ? IMG_URL + item.poster_path : PLACEHOLDER;
